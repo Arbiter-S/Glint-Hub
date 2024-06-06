@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  redis:
+    image: redis:7.0-alpine3.19
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  celery_worker:
+    build: .
+    container_name: celery_worker
+    command: celery -A config worker --loglevel=info
+    depends_on:
+      - redis
+
+  celery_beat:
+    build: .
+    container_name: celery_beat
+    command: celery -A config beat --loglevel=info
+    depends_on:
+      - celery_worker
+
+
