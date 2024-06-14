@@ -1,9 +1,13 @@
+# 3rd party library imports
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from rest_framework import status
+from django.core.exceptions import ValidationError
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
+
+# local imports
 from .serializers import UserRegisterSerializer
+from carts.models import Cart
 
 User = get_user_model()
 
@@ -18,12 +22,19 @@ class UserRegisterView(CreateAPIView):
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
 
-        # user creation
+        # user and cart creation
         username = serializer.data['username']
         password = serializer.data['password']
-        validate_password(password=password)  # TODO: Find a way to make the errors specefic. Right now it's just 500
-        User.objects.create_user(username=username, password=password)
+        try:
+            validate_password(password=password)
+            user = User.objects.create_user(username=username, password=password)
+            Cart.objects.create(user=user)
+            body = {'username': username, 'detail': 'User created successfully'}
+            status = 201
+        except ValidationError as error:
+            body = {'detail': 'Password validation failed', 'errors': error}
+            status = 401
 
         headers = self.get_success_headers(serializer.data)
-        body = {'username': username, 'message': 'User created successfully'}
-        return Response(data=body, status=status.HTTP_201_CREATED, headers=headers)
+
+        return Response(data=body, status=status, headers=headers)
