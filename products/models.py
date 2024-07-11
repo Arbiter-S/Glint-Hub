@@ -23,12 +23,12 @@ class Product(models.Model):
         ear: "Earring",
     }
 
-    name = models.CharField(max_length=55, null=False, blank=False)
+    name = models.CharField(max_length=55)
     description = models.TextField()
-    weight = models.DecimalField(max_digits=5, decimal_places=2, null=False, blank=False)
-    color = models.CharField(max_length=25, null=False, blank=False)
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    color = models.CharField(max_length=25)
     in_stock = models.SmallIntegerField(null=True, blank=True)
     category = models.CharField(max_length=10, choices=categories)
-    purity = models.SmallIntegerField(null=False, blank=False)
+    purity = models.SmallIntegerField()
     picture = models.ImageField(upload_to=image_path, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
