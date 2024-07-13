@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     # 3rd party
     'django_filters',
     'rest_framework',
+    'drf_spectacular',
     # apps
     'users',
     'products',
@@ -140,6 +141,15 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PARSER_CLASSES': ['rest_framework.parsers.JSONParser']
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'GlintHub',
+    'DESCRIPTION': 'GlintHub is an API to manage an online shop selling gold related products',
+    'VERSION': '0.2.0',
+    'AUTHENTICATION_WHITELIST': ['rest_framework_simplejwt.authentication.JWTAuthentication', ],
 }
 
 SIMPLE_JWT = {
@@ -191,7 +201,7 @@ CACHES = {
 
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_BEAT_SCHEDULE = {
-    'update_price' : {
+    'update_price': {
         'task': 'config.tasks.update_price',
         'schedule': 30
     }

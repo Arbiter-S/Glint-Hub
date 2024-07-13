@@ -12,7 +12,7 @@ from carts.models import Cart
 User = get_user_model()
 
 
-# Create your views here.
+# TODO: Simple JWT has a listed security issue. Learn more about it and see if you can find an alternative
 
 class UserRegisterView(CreateAPIView):
     serializer_class = UserRegisterSerializer

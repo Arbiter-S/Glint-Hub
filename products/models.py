@@ -12,16 +12,12 @@ def image_path(instance, filename):
 
 
 class Product(models.Model):
-    necklace = "neck"
-    bracelet = "brace"
-    watch = "watch"
-    ear = "ear"
-    categories = {
-        necklace: "Necklace",
-        bracelet: "Bracelet",
-        watch: "Watch",
-        ear: "Earring",
-    }
+    categories = [
+        ("neck", "Necklace"),
+        ("brace", "Bracelet"),
+        ("watch", "Watch"),
+        ("ear", "Earring"),
+    ]
 
     name = models.CharField(max_length=55)
     description = models.TextField()
