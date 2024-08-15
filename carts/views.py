@@ -11,6 +11,16 @@ from products.serializers import ProductAddCartSerializer
 
 
 class CartView(RetrieveAPIView):
+    """
+    Shows current user's cart.
+    This endpoint requires authentication.
+
+
+    Returns:
+        200 OK: Current user's Cart object
+        401 Unauthorized: if authentication fails.
+    """
+
     permission_classes = [IsAuthenticated]
     serializer_class = CartSerializer
 
@@ -19,6 +29,18 @@ class CartView(RetrieveAPIView):
 
 
 class CartAdd(CreateAPIView):
+    """
+    Adds a product to current user's cart.
+    This endpoint requires authentication.
+
+    Request Body:
+        product_id (int): ID of the product to add
+
+    Returns:
+        201 Created: product id of the added product
+        401 Unauthorized: if authentication fails.
+        400 Bad Request: if body's format is incorrect or a product with that id is not found.
+    """
     queryset = Cart.products.through.objects.all()
     permission_classes = [IsAuthenticated]
     serializer_class = ProductAddCartSerializer

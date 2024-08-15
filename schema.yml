@@ -152,6 +152,14 @@ paths:
   /cart/:
     get:
       operationId: cart_retrieve
+      description: |-
+        Shows current user's cart.
+        This endpoint requires authentication.
+
+
+        Returns:
+            200 OK: Current user's Cart object
+            401 Unauthorized: if authentication fails.
       tags:
       - cart
       security:
@@ -166,6 +174,17 @@ paths:
   /cart/add/:
     post:
       operationId: cart_add_create
+      description: |-
+        Adds a product to current user's cart.
+        This endpoint requires authentication.
+
+        Request Body:
+            product_id (int): ID of the product to add
+
+        Returns:
+            201 Created: product id of the added product
+            401 Unauthorized: if authentication fails.
+            400 Bad Request: if body's format is incorrect or a product with that id is not found.
       tags:
       - cart
       requestBody:
@@ -186,6 +205,12 @@ paths:
   /products/:
     get:
       operationId: products_list
+      description: |-
+        Returns a list of all products.
+        This endpoint accepts url parameters.
+
+        Returns:
+            200 OK: List of Product objects
       parameters:
       - in: query
         name: category
@@ -208,12 +233,12 @@ paths:
       - in: query
         name: price_range_max
         schema:
-          type: integer
+          type: string
         description: Price Range
       - in: query
         name: price_range_min
         schema:
-          type: integer
+          type: string
         description: Price Range
       tags:
       - products
@@ -232,6 +257,13 @@ paths:
   /products/{id}:
     get:
       operationId: products_retrieve
+      description: |-
+        Returns a single Product object.
+        Product ID is required in the URL.
+
+        Returns:
+            200 OK: Product object
+            404 Not Found: No product found with the requested ID
       parameters:
       - in: path
         name: id
@@ -295,6 +327,17 @@ paths:
   /users/register/:
     post:
       operationId: users_register_create
+      description: |-
+        Creates a new User object.
+
+        Request Body:
+            username (str): username for the new user
+            password (str): password for the new user
+
+        Returns:
+            201 Created: Username and a success message
+            400 Bad Request: If the username is not unique.
+            401 Unauthorized: If password is not validated.
       tags:
       - users
       requestBody:

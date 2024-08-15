@@ -15,6 +15,18 @@ User = get_user_model()
 # TODO: Simple JWT has a listed security issue. Learn more about it and see if you can find an alternative
 
 class UserRegisterView(CreateAPIView):
+    """
+    Creates a new User object.
+
+    Request Body:
+        username (str): username for the new user
+        password (str): password for the new user
+
+    Returns:
+        201 Created: Username and a success message
+        400 Bad Request: If the username is not unique.
+        401 Unauthorized: If password is not validated.
+    """
     serializer_class = UserRegisterSerializer
 
     def create(self, request, *args, **kwargs):
