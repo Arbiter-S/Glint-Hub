@@ -13,10 +13,10 @@ def image_path(instance, filename):
 
 class Product(models.Model):
     categories = [
-        ("neck", "Necklace"),
-        ("brace", "Bracelet"),
+        ("necklace", "Necklace"),
+        ("bracelet", "Bracelet"),
         ("watch", "Watch"),
-        ("ear", "Earring"),
+        ("earring", "Earring"),
     ]
 
     name = models.CharField(max_length=55)
@@ -25,6 +25,6 @@ class Product(models.Model):
     color = models.CharField(max_length=25)
     in_stock = models.SmallIntegerField(null=True, blank=True)
     category = models.CharField(max_length=10, choices=categories)
-    purity = models.SmallIntegerField()
+    purity = models.SmallIntegerField() #TODO: Make it so purity is taken into account for pricing
     picture = models.ImageField(upload_to=image_path, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)

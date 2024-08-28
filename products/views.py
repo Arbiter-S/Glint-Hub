@@ -10,13 +10,16 @@ from .serializers import ProductSerializer
 from .filters import ProductFilter
 
 
-def add_product_price():
+def add_product_price(queryset=None):
     try:
         price = cache.get('price', 3300000)
     # redis instance is down or not running
     except ConnectionError:
         price = 3300000
-    qs = Product.objects.annotate(total_price=F('weight') * price)
+    if queryset:
+        qs = queryset.annotate(price=F('weight') * price)
+    else:
+        qs = Product.objects.annotate(price=F('weight') * price)
     return qs
 
 

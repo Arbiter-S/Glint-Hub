@@ -7,15 +7,8 @@ from carts.models import Cart
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    price = serializers.IntegerField(source='total_price')
+    # price = serializers.IntegerField(source='price')
 
     class Meta:
         model = Product
         fields = '__all__'
-
-
-class ProductAddCartSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Cart.products.through
-        fields = ['product', ]
