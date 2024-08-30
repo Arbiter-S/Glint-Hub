@@ -2,9 +2,6 @@ from django.db import models
 import datetime
 
 
-# Create your models here.
-
-
 def image_path(instance, filename):
     # MEDIA_ROOT / user_ < id > / < filename >
     uploaded_date = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -21,7 +18,7 @@ class Product(models.Model):
 
     name = models.CharField(max_length=55)
     description = models.TextField()
-    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    weight = models.DecimalField(max_digits=5, decimal_places=2) # TODO: DRF serialization changes this to a string
     color = models.CharField(max_length=25)
     in_stock = models.SmallIntegerField(null=True, blank=True)
     category = models.CharField(max_length=10, choices=categories)

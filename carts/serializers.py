@@ -3,14 +3,15 @@ from rest_framework import serializers
 
 # local imports
 from .models import Cart, CartProduct
+from products.serializers import ProductSerializer
 
 class ProductCartSerializer(serializers.ModelSerializer):
-    product_id = serializers.IntegerField()
+    product = ProductSerializer(read_only=True)
+    # TODO: See if it's possible to handle price like the approach used in products endpoint
 
     class Meta:
         model = CartProduct
-        fields = ['product_id', 'product_quantity']
-        # TODO: find a way to add the price
+        fields = ['product_quantity', 'product']
 
 class CartSerializer(serializers.ModelSerializer):
     items = ProductCartSerializer(many=True, read_only=True, source='cartproduct_set')

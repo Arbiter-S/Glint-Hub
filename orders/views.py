@@ -7,8 +7,7 @@ from rest_framework.response import Response
 # Local imports
 from orders.models import Order
 from orders.serializers import OrderSerializer
-from products.views import add_product_price
-
+from products.utils import add_product_field
 
 
 class OrderCreateView(CreateAPIView):
@@ -26,7 +25,7 @@ class OrderCreateView(CreateAPIView):
         products = user.cart.products.all()
         serializer.validated_data['products'] = products
 
-        total_price = add_product_price(queryset=products).aggregate(total_price=Sum('price'))['total_price']
+        total_price = add_product_field(queryset=products).aggregate(total_price=Sum('price'))['total_price']
         serializer.validated_data['total_price'] = total_price
 
         self.perform_create(serializer)

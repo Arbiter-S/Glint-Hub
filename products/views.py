@@ -1,26 +1,10 @@
 # 3rd party library imports
-from django.db.models import F
-from django.core.cache import cache
-from redis.exceptions import ConnectionError
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 
 # Local imports
-from .models import Product
 from .serializers import ProductSerializer
 from .filters import ProductFilter
-
-
-def add_product_price(queryset=None):
-    try:
-        price = cache.get('price', 3300000)
-    # redis instance is down or not running
-    except ConnectionError:
-        price = 3300000
-    if queryset:
-        qs = queryset.annotate(price=F('weight') * price)
-    else:
-        qs = Product.objects.annotate(price=F('weight') * price)
-    return qs
+from .utils import add_product_field
 
 
 class ProductListView(ListAPIView):
@@ -36,7 +20,7 @@ class ProductListView(ListAPIView):
     filterset_class = ProductFilter
 
     def get_queryset(self):
-        return add_product_price()
+        return add_product_field()
 
 
 class ProductView(RetrieveAPIView):
@@ -51,4 +35,4 @@ class ProductView(RetrieveAPIView):
     serializer_class = ProductSerializer
 
     def get_queryset(self):
-        return add_product_price()
+        return add_product_field()
