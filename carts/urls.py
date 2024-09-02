@@ -1,11 +1,11 @@
 # 3rd party imports
 from django.urls import path
+from rest_framework import routers
 
 # local imports
-from .views import CartView, CartAdd
+from .views import CartViewSet
 
 
 urlpatterns = [
-    path('', CartView.as_view(), name='CartRetrieve'),
-    path('add/', CartAdd.as_view(), name='CartAdd')
+    path('', CartViewSet.as_view({'get': 'retrieve', 'post': 'create'}), name='CartRetrieve'),
 ]

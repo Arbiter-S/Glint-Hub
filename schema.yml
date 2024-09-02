@@ -153,12 +153,8 @@ paths:
     get:
       operationId: cart_retrieve
       description: |-
-        Shows current user's cart.
-        This endpoint requires authentication.
-
-
         Returns:
-            200 OK: Current user's Cart object
+            200 OK: Gives a list named items including the product id and quantity in current user's cart
             401 Unauthorized: if authentication fails.
       tags:
       - cart
@@ -169,17 +165,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Cart'
+                $ref: '#/components/schemas/CartRetrieve'
           description: ''
-  /cart/add/:
     post:
-      operationId: cart_add_create
+      operationId: cart_create
       description: |-
         Adds a product to current user's cart.
         This endpoint requires authentication.
 
         Request Body:
-            product (int): ID of the product to add
+            product_id (int): ID of the product to add
             product_quantity (int): Number of products to add
 
         Returns:
@@ -410,16 +405,16 @@ paths:
           description: ''
 components:
   schemas:
-    Cart:
+    CartRetrieve:
       type: object
       properties:
-        products:
+        items:
           type: array
           items:
-            type: integer
+            $ref: '#/components/schemas/ProductCart'
           readOnly: true
       required:
-      - products
+      - items
     CategoryEnum:
       enum:
       - necklace
@@ -456,6 +451,9 @@ components:
       properties:
         id:
           type: integer
+          readOnly: true
+        price:
+          type: string
           readOnly: true
         name:
           type: string
@@ -497,20 +495,27 @@ components:
       - description
       - id
       - name
+      - price
       - purity
       - weight
     ProductCart:
       type: object
       properties:
-        product:
+        product_id:
           type: integer
+          writeOnly: true
         product_quantity:
           type: integer
           maximum: 9223372036854775807
           minimum: 0
           format: int64
+        product:
+          allOf:
+          - $ref: '#/components/schemas/Product'
+          readOnly: true
       required:
       - product
+      - product_id
       - product_quantity
     StatusEnum:
       enum:
