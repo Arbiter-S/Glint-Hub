@@ -2,10 +2,12 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, viewsets
+from django.shortcuts import get_object_or_404
+
 
 # Local imports
 from .models import CartProduct, Cart
-from .serializers import CartRetrieveSerializer, ProductCartSerializer, CartDeleteSerializer
+from .serializers import CartRetrieveSerializer, ProductCartSerializer
 
 
 class CartViewSet(viewsets.GenericViewSet):
@@ -49,3 +51,19 @@ class CartViewSet(viewsets.GenericViewSet):
         serializer.validated_data['cart'] = cart
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Removes a product from current user's cart.
+        This endpoint requires authentication.
+
+        Returns:
+            204 No Content: Product is successfully removed from current user's cart.
+            401 Unauthorized: If authentication fails.
+            404 Not Found: If the product does not exist in the user's cart.
+        """
+        product_id = kwargs.get('product_id')
+        cart = Cart.objects.get(user=self.request.user)
+        instance = get_object_or_404(CartProduct, product=product_id, cart=cart)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

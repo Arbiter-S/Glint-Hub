@@ -20,10 +20,3 @@ class CartRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['items']
-
-class CartDeleteSerializer(serializers.ModelSerializer):
-    product_id = serializers.IntegerField(write_only=True, source='product')
-
-    class Meta:
-        model = CartProduct
-        fields = ['product_id']
