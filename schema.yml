@@ -154,7 +154,7 @@ paths:
       operationId: cart_retrieve
       description: |-
         Returns:
-            200 OK: Gives a list named items including the product id and quantity in current user's cart
+            200 OK: Gives a list named items including the product details and quantity in current user's cart
             401 Unauthorized: if authentication fails.
       tags:
       - cart
@@ -178,8 +178,8 @@ paths:
             product_quantity (int): Number of products to add
 
         Returns:
-            201 Created: product id and quantity of the added product
-            400 Bad Request: If body's format is incorrect or a product with that id is not found.
+            201 Created: Quantity and details of the added product
+            400 Bad Request: If request body's format is incorrect or a product with that id is not found.
             401 Unauthorized: If authentication fails.
             500 Internal Server Error: If user already has that product in their cart.
       tags:
@@ -205,6 +205,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProductCart'
           description: ''
+  /cart/{product_id}:
+    delete:
+      operationId: cart_destroy
+      description: |-
+        Removes a product from current user's cart.
+        This endpoint requires authentication.
+
+        Returns:
+            204 No Content: Product is successfully removed from current user's cart.
+            401 Unauthorized: If authentication fails.
+            404 Not Found: If the product does not exist in the user's cart.
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - cart
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
   /orders/place:
     post:
       operationId: orders_place_create
@@ -234,12 +258,7 @@ paths:
   /products/:
     get:
       operationId: products_list
-      description: |-
-        Returns a list of all products.
-        This endpoint accepts url parameters.
-
-        Returns:
-            200 OK: List of Product objects
+      description: Random documentation
       parameters:
       - in: query
         name: category
@@ -283,21 +302,16 @@ paths:
                 items:
                   $ref: '#/components/schemas/Product'
           description: ''
-  /products/{id}:
+  /products/{id}/:
     get:
       operationId: products_retrieve
-      description: |-
-        Returns a single Product object.
-        Product ID is required in the URL.
-
-        Returns:
-            200 OK: Product object
-            404 Not Found: No product found with the requested ID
+      description: Random documentation
       parameters:
       - in: path
         name: id
         schema:
           type: integer
+        description: A unique integer value identifying this product.
         required: true
       tags:
       - products
