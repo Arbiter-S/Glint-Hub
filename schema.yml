@@ -152,10 +152,10 @@ paths:
   /cart/:
     get:
       operationId: cart_retrieve
-      description: |-
-        Returns:
-            200 OK: Gives a list named items including the product details and quantity in current user's cart
-            401 Unauthorized: if authentication fails.
+      description: "Returns a list named items including the products in current users\
+        \ cart with their quantity.\n        \n        This endpoint requires authentication.\n\
+        \        "
+      summary: Returns current user's cart
       tags:
       - cart
       security:
@@ -167,21 +167,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartRetrieve'
           description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          description: ''
     post:
       operationId: cart_create
-      description: |-
-        Adds a product to current user's cart.
-        This endpoint requires authentication.
-
-        Request Body:
-            product_id (int): ID of the product to add
-            product_quantity (int): Number of products to add
-
-        Returns:
-            201 Created: Quantity and details of the added product
-            400 Bad Request: If request body's format is incorrect or a product with that id is not found.
-            401 Unauthorized: If authentication fails.
-            500 Internal Server Error: If user already has that product in their cart.
+      description: "Adds a product to current user's cart. Returns product quantity\
+        \ and  its details.\n        \n        This endpoint requires authentication.\n\
+        \        "
+      summary: Adds a product to cart
       tags:
       - cart
       requestBody:
@@ -205,17 +202,26 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProductCart'
           description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          description: ''
+        '500':
+          description: No response body
   /cart/{product_id}:
     delete:
       operationId: cart_destroy
-      description: |-
-        Removes a product from current user's cart.
-        This endpoint requires authentication.
-
-        Returns:
-            204 No Content: Product is successfully removed from current user's cart.
-            401 Unauthorized: If authentication fails.
-            404 Not Found: If the product does not exist in the user's cart.
+      description: "Removes a product from current user's cart.\n        \n      \
+        \  This endpoint requires authentication.\n        "
+      summary: Removes a product from cart
       parameters:
       - in: path
         name: product_id
@@ -229,6 +235,18 @@ paths:
       responses:
         '204':
           description: No response body
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartProductDoesNotExist'
+          description: ''
   /orders/place:
     post:
       operationId: orders_place_create
@@ -258,7 +276,9 @@ paths:
   /products/:
     get:
       operationId: products_list
-      description: Random documentation
+      description: "Returns a list of product objects \n        including all their\
+        \ fields with their current price"
+      summary: Returns a list of products
       parameters:
       - in: query
         name: category
@@ -305,7 +325,9 @@ paths:
   /products/{id}/:
     get:
       operationId: products_retrieve
-      description: Random documentation
+      description: "Returns details of a product object \n        including all it's\
+        \ fields with it's current price"
+      summary: Returns a product's details
       parameters:
       - in: path
         name: id
@@ -324,6 +346,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Product'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDoesNotExist'
           description: ''
   /users/api/login-refresh/:
     post:
@@ -419,6 +447,18 @@ paths:
           description: ''
 components:
   schemas:
+    BadRequest:
+      type: object
+      properties:
+        field_name:
+          type: string
+          default: This field is required.
+    CartProductDoesNotExist:
+      type: object
+      properties:
+        detail:
+          type: string
+          default: No CartProduct matches the given query
     CartRetrieve:
       type: object
       properties:
@@ -467,7 +507,7 @@ components:
           type: integer
           readOnly: true
         price:
-          type: string
+          type: integer
           readOnly: true
         name:
           type: string
@@ -531,6 +571,12 @@ components:
       - product
       - product_id
       - product_quantity
+    ProductDoesNotExist:
+      type: object
+      properties:
+        detail:
+          type: string
+          default: No Product matches the given query
     StatusEnum:
       enum:
       - pending
@@ -579,6 +625,12 @@ components:
       required:
       - access
       - refresh
+    Unauthorized:
+      type: object
+      properties:
+        detail:
+          type: string
+          default: Authentication credentials were not provided.
     UserRegister:
       type: object
       properties:

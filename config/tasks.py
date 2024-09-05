@@ -2,7 +2,6 @@ import requests
 import os
 from dotenv import load_dotenv
 from django.core.cache import cache
-from random import randint
 from celery import shared_task
 load_dotenv()
 

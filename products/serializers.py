@@ -9,7 +9,7 @@ from products.utils import fetch_price
 class ProductSerializer(serializers.ModelSerializer):
     price = serializers.SerializerMethodField()
 
-    def get_price(self, obj):
+    def get_price(self, obj) -> int:
         if hasattr(obj, 'price'):
             return obj.price
 
