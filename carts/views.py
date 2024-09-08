@@ -11,6 +11,7 @@ from .serializers import CartRetrieveSerializer, ProductCartSerializer
 from utils.document import authentication_401, bad_request_400, not_found_404
 
 
+# TODO: Implement changing product quantity
 class CartViewSet(viewsets.GenericViewSet):
 
     permission_classes = [IsAuthenticated]

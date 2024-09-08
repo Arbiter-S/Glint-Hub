@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 # Local imports
 from .models import Product
-from products.utils import fetch_price
+from utils.product import fetch_price
 
 
 class ProductSerializer(serializers.ModelSerializer):

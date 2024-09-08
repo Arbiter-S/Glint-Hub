@@ -6,7 +6,7 @@ from rest_framework.serializers import CharField
 # Local imports
 from .serializers import ProductSerializer
 from .filters import ProductFilter
-from .utils import add_product_field
+from utils.product import add_price_field
 from utils.document import not_found_404
 
 @extend_schema_view(
@@ -32,5 +32,5 @@ class ProductViewSet(ReadOnlyModelViewSet):
     filterset_class = ProductFilter
 
     def get_queryset(self):
-        return add_product_field()
+        return add_price_field()
 

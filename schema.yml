@@ -247,31 +247,146 @@ paths:
               schema:
                 $ref: '#/components/schemas/CartProductDoesNotExist'
           description: ''
-  /orders/place:
+  /orders/:
+    get:
+      operationId: orders_list
+      description: "Returns a simplified list of orders for the current user.\n  \
+        \      \n        This endpoint requires authentication."
+      summary: Returns a list of orders
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderList'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          description: ''
     post:
-      operationId: orders_place_create
+      operationId: orders_create
+      description: "Creates an order from products in user's cart and removes products\
+        \ from the cart.\n        \n        This endpoint requires authentication. "
+      summary: Creates an order
       tags:
       - orders
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: '#/components/schemas/OrderRetrieve'
           application/x-www-form-urlencoded:
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: '#/components/schemas/OrderRetrieve'
           multipart/form-data:
             schema:
-              $ref: '#/components/schemas/Order'
+              $ref: '#/components/schemas/OrderRetrieve'
+        required: true
       security:
       - jwtAuth: []
-      - {}
       responses:
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderRetrieve'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          description: ''
+  /orders/{id}/:
+    get:
+      operationId: orders_retrieve
+      description: "Returns a more detailed representation of an Order object\n  \
+        \      \n        This endpoint requires authentication."
+      summary: Returns an Order object
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this order.
+        required: true
+      tags:
+      - orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRetrieve'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDoesNotExist'
+          description: ''
+    patch:
+      operationId: orders_partial_update
+      description: "Updates note and address fields on an Order object.\n        \n\
+        \        This endpoint requires authentication."
+      summary: Updates info on an order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this order.
+        required: true
+      tags:
+      - orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRetrieve'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRetrieve'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOrderRetrieve'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRetrieve'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDoesNotExist'
           description: ''
   /products/:
     get:
@@ -325,8 +440,8 @@ paths:
   /products/{id}/:
     get:
       operationId: products_retrieve
-      description: "Returns details of a product object \n        including all it's\
-        \ fields with it's current price"
+      description: "Returns details of a product object \n        including all its\
+        \ fields with its current price"
       summary: Returns a product's details
       parameters:
       - in: path
@@ -481,25 +596,116 @@ components:
         * `bracelet` - Bracelet
         * `watch` - Watch
         * `earring` - Earring
-    Order:
+    OrderDoesNotExist:
+      type: object
+      properties:
+        detail:
+          type: string
+          default: No Order matches the given query
+    OrderList:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
         total_price:
-          type: string
-          format: decimal
-          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          type: integer
           readOnly: true
         status:
           allOf:
           - $ref: '#/components/schemas/StatusEnum'
           readOnly: true
+        tracking_number:
+          type: string
+          readOnly: true
+          nullable: true
       required:
       - id
       - status
       - total_price
+      - tracking_number
+    OrderProduct:
+      type: object
+      properties:
+        product:
+          allOf:
+          - $ref: '#/components/schemas/ProductSummary'
+          readOnly: true
+        product_quantity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        product_price:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - product
+      - product_price
+      - product_quantity
+    OrderRetrieve:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderProduct'
+          readOnly: true
+        total_price:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        address:
+          type: string
+        note:
+          type: string
+          nullable: true
+        tracking_number:
+          type: string
+          readOnly: true
+          nullable: true
+      required:
+      - address
+      - id
+      - items
+      - status
+      - total_price
+      - tracking_number
+    PatchedOrderRetrieve:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderProduct'
+          readOnly: true
+        total_price:
+          type: integer
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        address:
+          type: string
+        note:
+          type: string
+          nullable: true
+        tracking_number:
+          type: string
+          readOnly: true
+          nullable: true
     Product:
       type: object
       properties:
@@ -577,6 +783,24 @@ components:
         detail:
           type: string
           default: No Product matches the given query
+    ProductSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        picture:
+          type: string
+          format: uri
+          readOnly: true
+          nullable: true
+      required:
+      - id
+      - name
+      - picture
     StatusEnum:
       enum:
       - pending
