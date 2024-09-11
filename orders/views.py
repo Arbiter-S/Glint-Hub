@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django.db import transaction
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 
 # Local imports
 from orders.models import Order, OrderProduct
@@ -74,15 +74,16 @@ class OrderViewSet(ModelViewSet):
         request=OrderRetrieveSerializer,
         responses={
             201: OrderRetrieveSerializer,
-            400: non_field_errors_400(),
+            400: OpenApiResponse(response=non_field_errors_400(), description="Validation error. "
+                                                                              "Check non_field_errors for more info."),
             401: authentication_401(),
         }
     )
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        address = serializer.validated_data['address']
-        note = serializer.validated_data['note']
+        address = serializer.validated_data.get('address')
+        note = serializer.validated_data.get('note', None)
 
         with transaction.atomic():
             # getting the fields

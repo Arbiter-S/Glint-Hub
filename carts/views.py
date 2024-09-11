@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status, viewsets
 from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 # Local imports
 from .models import CartProduct, Cart
@@ -49,7 +49,8 @@ class CartViewSet(viewsets.GenericViewSet):
             201 : ProductCartSerializer,
             400 : bad_request_400(),
             401 : authentication_401(),
-            500 : None, # TODO: See if you can make this more detailed
+            500 : OpenApiResponse(response=None, description="Product is already in the cart or"
+                                                             " product with that id does not exist")
         }
     )
     def create(self, request, *args, **kwargs):

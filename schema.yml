@@ -215,7 +215,8 @@ paths:
                 $ref: '#/components/schemas/Unauthorized'
           description: ''
         '500':
-          description: No response body
+          description: Product is already in the cart or product with that id does
+            not exist
   /cart/{product_id}:
     delete:
       operationId: cart_destroy
@@ -305,7 +306,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/non_field_errors'
-          description: ''
+          description: Validation error. Check non_field_errors for more info.
         '401':
           content:
             application/json:
