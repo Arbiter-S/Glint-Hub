@@ -11,3 +11,6 @@ def authentication_401():
 def bad_request_400():
     return inline_serializer('BadRequest', {'field_name':
                                                   CharField(default='This field is required.')})
+def non_field_errors_400():
+    return inline_serializer('non_field_errors', {'non_field_errors':
+                                                  CharField(default='Error message')})

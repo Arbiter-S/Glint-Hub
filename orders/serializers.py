@@ -1,4 +1,8 @@
+# 3rd party library imports
 from rest_framework.serializers import ModelSerializer
+from rest_framework.exceptions import ValidationError
+
+# Local imports
 from orders.models import Order, OrderProduct
 from products.models import Product
 
@@ -24,6 +28,18 @@ class OrderRetrieveSerializer(ModelSerializer):
         model = Order
         fields = ['id','items', 'total_price', 'status', 'address', 'note', 'tracking_number']
         read_only_fields = ['id', 'total_price', 'status', 'tracking_number']
+
+    def validate(self, attrs):
+        request = self.context['request']
+        if request.method == 'POST':
+            user = request.user
+            if not user.cart.products.all().exists():
+                raise ValidationError('User has no products in their cart')
+        elif request.method == 'PATCH':
+            if self.instance.status not in ['pending', 'processing']:
+                raise ValidationError("User can't change order info after it's been shipped or canceled")
+
+        return attrs
 
 class OrderListSerializer(ModelSerializer):
 

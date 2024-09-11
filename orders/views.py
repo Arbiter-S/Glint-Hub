@@ -10,10 +10,8 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 from orders.models import Order, OrderProduct
 from orders.serializers import OrderRetrieveSerializer, OrderListSerializer
 from utils.product import add_price_field
-from utils.document import authentication_401, not_found_404
+from utils.document import authentication_401, not_found_404, non_field_errors_400
 
-# TODO: Add validations for order creation so we can't have an empty order
-# TODO: Add validations for order update so it's not possible after certain status
 
 
 @extend_schema_view(
@@ -46,6 +44,7 @@ from utils.document import authentication_401, not_found_404
         responses={
             200: OrderRetrieveSerializer,
             401: authentication_401(),
+            400: non_field_errors_400(),
             404: not_found_404('Order'),
         }
 
@@ -58,7 +57,7 @@ class OrderViewSet(ModelViewSet):
 
 
     def get_queryset(self):
-        user = self.request.user
+        user = self.request.user #TODO: Consider changing for invalid status
         qs = Order.objects.filter(user=user)
         return qs
 
@@ -75,6 +74,7 @@ class OrderViewSet(ModelViewSet):
         request=OrderRetrieveSerializer,
         responses={
             201: OrderRetrieveSerializer,
+            400: non_field_errors_400(),
             401: authentication_401(),
         }
     )
