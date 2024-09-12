@@ -20,3 +20,11 @@ class CartRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = ['items']
+
+class CartUpdateSerializer(serializers.ModelSerializer):
+    product_quantity = serializers.IntegerField(min_value=1, required=True)
+
+
+    class Meta:
+        model = CartProduct
+        fields = ['product_quantity']

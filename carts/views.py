@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 # Local imports
 from .models import CartProduct, Cart
-from .serializers import CartRetrieveSerializer, ProductCartSerializer
+from .serializers import CartRetrieveSerializer, ProductCartSerializer, CartUpdateSerializer
 from utils.document import authentication_401, bad_request_400, not_found_404
 
 
@@ -20,6 +20,8 @@ class CartViewSet(viewsets.GenericViewSet):
             return CartRetrieveSerializer
         elif self.action == 'create':
             return ProductCartSerializer
+        elif self.action == 'update':
+            return CartUpdateSerializer
 
     @extend_schema(
         summary="Returns current user's cart",
@@ -46,10 +48,10 @@ class CartViewSet(viewsets.GenericViewSet):
         """,
         request=ProductCartSerializer,
         responses={
-            201 : ProductCartSerializer,
-            400 : bad_request_400(),
-            401 : authentication_401(),
-            500 : OpenApiResponse(response=None, description="Product is already in the cart or"
+            201:ProductCartSerializer,
+            400:bad_request_400(),
+            401:authentication_401(),
+            500:OpenApiResponse(response=None, description="Product is already in the cart or"
                                                              " product with that id does not exist")
         }
     )
@@ -69,9 +71,9 @@ class CartViewSet(viewsets.GenericViewSet):
         This endpoint requires authentication.
         """,
         responses={
-            204 : None,
-            401 : authentication_401(),
-            404 : not_found_404('CartProduct')
+            204:None,
+            401:authentication_401(),
+            404:not_found_404('CartProduct')
         })
     def destroy(self, request, *args, **kwargs):
         product_id = kwargs.get('product_id')
@@ -79,3 +81,26 @@ class CartViewSet(viewsets.GenericViewSet):
         instance = get_object_or_404(CartProduct, product=product_id, cart=cart)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @extend_schema(
+        summary="Updates a product's quantity in the cart",
+        description="""Updates quantity of a product in current user's cart.
+        
+        This endpoint requires authentication.""",
+        request=CartUpdateSerializer,
+        responses={
+            200:CartUpdateSerializer,
+            400:bad_request_400(),
+            401:authentication_401(),
+            404:not_found_404('CartProduct')
+        }
+    )
+    def update(self, request, *args, **kwargs): # TODO: Check if patch requests with no body should return a 400 error
+        product_id = kwargs.get('product_id')
+        cart = Cart.objects.get(user=self.request.user)
+        instance = get_object_or_404(CartProduct, product=product_id, cart=cart)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)

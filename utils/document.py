@@ -9,8 +9,6 @@ def authentication_401():
     return inline_serializer('Unauthorized', {'detail':
                                                   CharField(default='Authentication credentials were not provided.')})
 def bad_request_400():
-    return inline_serializer('BadRequest', {'field_name':
-                                                  CharField(default='This field is required.')})
-def non_field_errors_400():
-    return inline_serializer('non_field_errors', {'non_field_errors':
-                                                  CharField(default='Error message')})
+    return inline_serializer('BadRequest', {'field_name1': CharField(default='This field is required.'),
+                                                        'field_name2': CharField(default="A valid {type} is required."),
+                                                        'non_field_errors': CharField(default='Validation error message')})

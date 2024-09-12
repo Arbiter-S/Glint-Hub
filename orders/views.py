@@ -10,7 +10,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResp
 from orders.models import Order, OrderProduct
 from orders.serializers import OrderRetrieveSerializer, OrderListSerializer
 from utils.product import add_price_field
-from utils.document import authentication_401, not_found_404, non_field_errors_400
+from utils.document import authentication_401, not_found_404, bad_request_400
 
 
 
@@ -44,7 +44,7 @@ from utils.document import authentication_401, not_found_404, non_field_errors_4
         responses={
             200: OrderRetrieveSerializer,
             401: authentication_401(),
-            400: non_field_errors_400(),
+            400: bad_request_400(),
             404: not_found_404('Order'),
         }
 
@@ -74,8 +74,7 @@ class OrderViewSet(ModelViewSet):
         request=OrderRetrieveSerializer,
         responses={
             201: OrderRetrieveSerializer,
-            400: OpenApiResponse(response=non_field_errors_400(), description="Validation error. "
-                                                                              "Check non_field_errors for more info."),
+            400: bad_request_400(),
             401: authentication_401(),
         }
     )
