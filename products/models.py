@@ -20,7 +20,7 @@ class Product(models.Model):
     description = models.TextField()
     weight = models.DecimalField(max_digits=5, decimal_places=2) # TODO: DRF serialization changes this to a string
     color = models.CharField(max_length=25)
-    in_stock = models.SmallIntegerField(null=True, blank=True)
+    in_stock = models.PositiveSmallIntegerField(null=True, blank=True)
     category = models.CharField(max_length=10, choices=categories)
     purity = models.SmallIntegerField() #TODO: Make it so purity is taken into account for pricing
     picture = models.ImageField(upload_to=image_path, null=True, blank=True)
