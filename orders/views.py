@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django.db import transaction
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 # Local imports
 from orders.models import Order, OrderProduct
@@ -102,8 +102,8 @@ class OrderViewSet(ModelViewSet):
 
             order = Order(user=user, total_price=total_price, address=address, note=note)
             order.save()
-            for cart_product in cart_products:
-                # getting the price
+            for cart_product in cart_products: # This section populates products field of an order
+                # getting the price for each item in the order
                 product_id = cart_product.product.id
                 product = products.get(pk=product_id)
                 price = product.price
