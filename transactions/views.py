@@ -6,6 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 import requests
 from requests.exceptions import JSONDecodeError
+from drf_spectacular.utils import extend_schema_view, extend_schema, inline_serializer
+from rest_framework.serializers import IntegerField, CharField
 
 # Local imports
 from orders.models import Order
@@ -13,9 +15,22 @@ from utils.order import get_order_price
 from .models import Transaction
 from orders.serializers import OrderRetrieveSerializer
 
-
+@extend_schema_view(
+    get=extend_schema(
+        summary="Returns the payment gateway URL for an order",
+        description="""Returns the payment gateway URL for a pending order.
+        Will return 409 if order price is not up to date.
+        For a complete list of gateway errors please visit https://www.zarinpal.com/docs/paymentGateway/
+        
+        
+        This endpoint requires authentication.""",
+        responses={
+            200: inline_serializer("Gateway URL", {'status_code': IntegerField(max_value=100),
+                                    'url':CharField(default='https://sandbox.zarinpal.com/pg/StartPay/{authority}')}),
+        }
+    )
+)
 class PaymentInitiatorView(APIView):
-    #https://www.zarinpal.com/docs/paymentGateway/
     permission_classes = [IsAuthenticated]
 
 
@@ -66,8 +81,13 @@ class PaymentInitiatorView(APIView):
 
 
 
-
-
+@extend_schema_view(
+    get=extend_schema(
+        summary='Handles payment verification.',
+        description="""Users would normally not send any requests to this endpoint.
+        This is only used by the payment gateway to signal a transactions status."""
+    )
+)
 class PaymentVerifierView(APIView):
     serializer_class = OrderRetrieveSerializer
 
