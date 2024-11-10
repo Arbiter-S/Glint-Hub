@@ -35,11 +35,12 @@ class UserRegisterView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
 
         # user and cart creation
-        username = serializer.data['username']
-        password = serializer.data['password']
+        username = serializer.data.get('username')
+        password = serializer.data.get('password')
+        email = serializer.data.get('email')
         try:
             validate_password(password=password)
-            user = User.objects.create_user(username=username, password=password)
+            user = User.objects.create_user(username=username, password=password, email=email)
             Cart.objects.create(user=user)
             body = {'username': username, 'detail': 'User created successfully'}
             status = 201

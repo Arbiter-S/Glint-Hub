@@ -1,8 +1,11 @@
 import os
 from celery import Celery
+from utils.generic import fetch_settings
+
+settings = fetch_settings()
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'config.settings.{settings}')
 
 celery = Celery('config')
 

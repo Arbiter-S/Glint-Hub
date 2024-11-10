@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from django.db.models import Q
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 User = get_user_model()
