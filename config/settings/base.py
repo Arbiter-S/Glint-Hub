@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -186,10 +187,15 @@ SIMPLE_JWT = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://localhost:6379",
+    },
+    "docker": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": "redis://redis:6379",
     }
 }
 
+# Celery configuration
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_BEAT_SCHEDULE = {
     'update_price': {
@@ -197,3 +203,9 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 60 * 120
     }
 }
+
+#SMTP configuration
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 2525
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''

@@ -1,10 +1,12 @@
 import requests
 import os
 from dotenv import load_dotenv
-from django.core.cache import cache
+from django.core.cache import caches
 from celery import shared_task
 
 load_dotenv()
+
+cache = caches['docker']
 
 @shared_task
 def update_price():
