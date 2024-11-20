@@ -218,6 +218,57 @@ paths:
           description: Product is already in the cart or product with that id does
             not exist
   /cart/{product_id}:
+    patch:
+      operationId: cart_partial_update
+      description: "Updates quantity of a product in current user's cart.\n      \
+        \  \n        This endpoint requires authentication."
+      summary: Updates a product's quantity in the cart
+      parameters:
+      - in: path
+        name: product_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCartUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCartUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCartUpdate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartUpdate'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+          description: ''
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+          description: ''
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartProductDoesNotExist'
+          description: ''
     delete:
       operationId: cart_destroy
       description: "Removes a product from current user's cart.\n        \n      \
@@ -305,8 +356,8 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/non_field_errors'
-          description: Validation error. Check non_field_errors for more info.
+                $ref: '#/components/schemas/BadRequest'
+          description: ''
         '401':
           content:
             application/json:
@@ -393,7 +444,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/non_field_errors'
+                $ref: '#/components/schemas/BadRequest'
           description: ''
         '404':
           content:
@@ -426,6 +477,18 @@ paths:
         name: name
         schema:
           type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
       - in: query
         name: price_range_max
         schema:
@@ -446,9 +509,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Product'
+                $ref: '#/components/schemas/PaginatedProductList'
           description: ''
   /products/{id}/:
     get:
@@ -481,32 +542,49 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProductDoesNotExist'
           description: ''
-  /users/api/login-refresh/:
-    post:
-      operationId: users_api_login_refresh_create
-      description: |-
-        Takes a refresh type JSON web token and returns an access type JSON web
-        token if the refresh token is valid.
-      tags:
-      - users
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TokenRefresh'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/TokenRefresh'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/TokenRefresh'
+  /transactions/initiate/{order_id}/:
+    get:
+      operationId: transactions_initiate_retrieve
+      description: "Returns the payment gateway URL for a pending order.\n       \
+        \ Will return 409 if order price is not up to date.\n        For a complete\
+        \ list of gateway errors please visit https://www.zarinpal.com/docs/paymentGateway/\n\
+        \        \n        \n        This endpoint requires authentication."
+      summary: Returns the payment gateway URL for an order
+      parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
         required: true
+      tags:
+      - transactions
+      security:
+      - jwtAuth: []
       responses:
         '200':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenRefresh'
+                $ref: '#/components/schemas/Gateway URL'
+          description: ''
+  /transactions/verify/callback:
+    get:
+      operationId: transactions_verify_callback_retrieve
+      description: |-
+        Users would normally not send any requests to this endpoint.
+                This is only used by the payment gateway to signal a transactions status.
+      summary: Handles payment verification.
+      tags:
+      - transactions
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderRetrieve'
           description: ''
   /users/login/:
     post:
@@ -534,6 +612,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /users/login-refresh/:
+    post:
+      operationId: users_login_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
           description: ''
   /users/register/:
     post:
@@ -573,14 +678,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRegister'
           description: ''
+  /users/verify-email/{id}/:
+    get:
+      operationId: users_verify_email_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: users_verify_email_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
 components:
   schemas:
     BadRequest:
       type: object
       properties:
-        field_name:
+        field_name1:
           type: string
           default: This field is required.
+        field_name2:
+          type: string
+          default: A valid {type} is required.
+        non_field_errors:
+          type: string
+          default: Validation error message
     CartProductDoesNotExist:
       type: object
       properties:
@@ -597,6 +739,14 @@ components:
           readOnly: true
       required:
       - items
+    CartUpdate:
+      type: object
+      properties:
+        product_quantity:
+          type: integer
+          minimum: 1
+      required:
+      - product_quantity
     CategoryEnum:
       enum:
       - necklace
@@ -609,6 +759,17 @@ components:
         * `bracelet` - Bracelet
         * `watch` - Watch
         * `earring` - Earring
+    Gateway URL:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          maximum: 100
+        url:
+          type: string
+          default: https://sandbox.zarinpal.com/pg/StartPay/{authority}
+      required:
+      - status_code
     OrderDoesNotExist:
       type: object
       properties:
@@ -692,6 +853,35 @@ components:
       - status
       - total_price
       - tracking_number
+    PaginatedProductList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    PatchedCartUpdate:
+      type: object
+      properties:
+        product_quantity:
+          type: integer
+          minimum: 1
     PatchedOrderRetrieve:
       type: object
       properties:
@@ -743,7 +933,7 @@ components:
         in_stock:
           type: integer
           maximum: 9223372036854775807
-          minimum: -9223372036854775808
+          minimum: 0
           format: int64
           nullable: true
         category:
@@ -779,9 +969,6 @@ components:
           writeOnly: true
         product_quantity:
           type: integer
-          maximum: 9223372036854775807
-          minimum: 0
-          format: int64
         product:
           allOf:
           - $ref: '#/components/schemas/Product'
@@ -880,15 +1067,14 @@ components:
         password:
           type: string
           maxLength: 128
+        email:
+          type: string
+          format: email
+          maxLength: 254
       required:
+      - email
       - password
       - username
-    non_field_errors:
-      type: object
-      properties:
-        non_field_errors:
-          type: string
-          default: Error message
   securitySchemes:
     jwtAuth:
       type: http
