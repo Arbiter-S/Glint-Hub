@@ -22,7 +22,16 @@ redis = "^5.2.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.3"
+pytest-django = "^4.9.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+# Pytest configurations
+[tool.pytest.ini_options]
+python_files = 'tests.py'
+required_plugins = 'pytest-django'
+DJANGO_SETTINGS_MODULE = 'config.settings.development' # pytest-django required settings
+#TODO: Tried converage using pytest-cov and it doesn't play well with pytest-django. Check later using the coverage library
+# or alternative libraries
