@@ -1,24 +1,21 @@
+# Avoid using a container name as it causes conflicts with containers made for testing unless you make a docker-compose for testing
 services:
   redis:
     image: redis:7.0-alpine3.19
-    container_name: redis
     ports:
       - "6379:6379"
 
   celery_worker:
     build: .
-    container_name: celery_worker
     command: celery -A config worker --loglevel=info
     environment:
-      - API_KEY=${API_KEY}
+      - API_KEY=${API_KEY} #TODO: Apparently there is a more secure way to handle environment verbalises called secrets. Read more about it and implement it if it's not overkill.
     depends_on:
       - redis
 
   celery_beat:
     build: .
-    container_name: celery_beat
     command: celery -A config beat --loglevel=info
     depends_on:
       - celery_worker
-
 

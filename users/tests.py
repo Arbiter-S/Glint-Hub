@@ -1,7 +1,10 @@
+from secrets import randbelow
+
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from django.urls import reverse
+from django.core.cache import cache as cache_instance
 
 User = get_user_model()
 
@@ -25,7 +28,7 @@ def test_register_with_weak_password(password):
     assert response.status_code == 401
     assert response.json().get('errors')[0] == errors[password]
 @pytest.mark.django_db
-def test_successful_registration():
+def test_registration_successful():
     client = APIClient()
     body = {
         'username': 'JohnDoe',
@@ -40,3 +43,56 @@ def test_successful_registration():
     }
     qs = User.objects.filter(email='johndoe@example.com')
     assert qs.exists()
+
+@pytest.fixture(scope="session")
+def docker_compose_file():
+    return r"D:\Projects\Python\GlintHub\docker-compose.yml"
+
+@pytest.mark.django_db
+@pytest.mark.docker
+def test_email_verification_initiate_successful(docker_services):
+    client = APIClient()
+    user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
+    client.force_authenticate(user)
+    response = client.get(reverse('EmailVerification', kwargs={'user_id': user.id}))
+    assert response.json() == {'message': 'verification code has been emailed successfully'}
+
+@pytest.mark.django_db
+def test_email_verification_initiate_already_verified():
+    client = APIClient()
+    user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
+    user.is_email_verified = True
+    client.force_authenticate(user)
+    response = client.get(reverse('EmailVerification', kwargs={'user_id': user.id}))
+    assert response.json() == {"message": "Email is already verified"}
+    assert response.status_code == 200
+
+@pytest.fixture(scope="function")
+def code_generation(docker_services):
+    client = APIClient()
+    user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
+    client.force_authenticate(user)
+    response = client.get(reverse('EmailVerification', kwargs={'user_id': user.id}))
+    assert cache_instance.get(f'verify_email_{user.id}') is not None
+    return user, client
+
+@pytest.mark.django_db
+@pytest.mark.docker
+def test_email_verification_confirmation_successful(code_generation):
+    user, client = code_generation
+    code = cache_instance.get(f'verify_email_{user.id}')
+    body = {'code': code}
+    response = client.post(reverse('EmailVerification', kwargs={'user_id': user.id}), body, format='json')
+    assert response.status_code == 200
+    assert response.json() == {'message': 'Email has been verified successfully'}
+    assert user.is_email_verified is True
+
+@pytest.mark.django_db
+@pytest.mark.docker
+def test_email_verification_confirmation_failure(code_generation):
+    user, client = code_generation
+    body = {'code': randbelow(900000) + 100000} # TODO: Should I make sure codes aren't the same?(1 in 900000)
+    response = client.post(reverse('EmailVerification', kwargs={'user_id': user.id}), body, format='json')
+    assert response.status_code == 400
+    assert response.json() == {'message': 'Invalid verification code'}
+    assert user.is_email_verified is False

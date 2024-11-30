@@ -60,13 +60,13 @@ class UserRegisterView(CreateAPIView):
 
 
 
-class VerifyEmailInitiate(APIView):
+class VerifyEmail(APIView):
     permission_classes = [IsAuthenticated, VerificationPermission]
 
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.is_email_verified:
-            return Response(status=400, data={'message': 'Email is already verified'})
+            return Response(status=200, data={'message': 'Email is already verified'})
 
         # avoid too many requests
         if not cache.get(f'verify_email_{user.id}'):

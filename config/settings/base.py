@@ -200,7 +200,7 @@ CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_BEAT_SCHEDULE = {
     'update_price': {
         'task': 'config.tasks.update_price',
-        'schedule': 60
+        'schedule': 60 * 30
     }
 }
 
