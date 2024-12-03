@@ -2,7 +2,8 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 urlpatterns = [
     # Documents
@@ -14,4 +15,4 @@ urlpatterns = [
     path('cart/', include('carts.urls')),
     path('orders/', include('orders.urls')),
     path('transactions/', include('transactions.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + debug_toolbar_urls()
