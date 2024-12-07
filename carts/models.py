@@ -12,7 +12,7 @@ class Cart(models.Model):
     products = models.ManyToManyField(Product, through='CartProduct', blank=True)
     
 class CartProduct(models.Model):
-    cart = models.ForeignKey(Cart,on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     product_quantity = models.PositiveSmallIntegerField()
 

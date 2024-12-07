@@ -4,6 +4,12 @@ import os
 import sys
 from utils.generic import fetch_settings
 
+# Making logs directory to avoid errors by the loggers
+script_dir = os.path.dirname(os.path.realpath(__file__))
+log_dir = os.path.join(script_dir, 'logs')
+os.makedirs(log_dir, exist_ok=True)
+
+
 settings = fetch_settings()
 
 

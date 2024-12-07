@@ -2,7 +2,6 @@ from pathlib import Path
 from datetime import timedelta
 import os
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -123,7 +122,68 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# added settings
+# logging configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    'formatters': {
+        'simple': {
+            'format': '[{asctime}] {levelname} {message}',
+            'datefmt': '%d/%b/%Y:%H:%M:%S %z',
+            'style': '{',
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "filters": ["require_debug_true",],
+            "class": "logging.StreamHandler",
+            "formatter": "simple"
+        },
+        "django_general": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "logs/django_general.log",
+            "formatter": "simple",
+        },
+        "django_server": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "logs/django_server.log",
+            "formatter": "simple",
+        },
+        "root_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "logs/root.log",
+            "formatter": "simple",
+        }
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["django_general", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["django_server", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        '': {
+            "handlers": ["root_file", "console"],
+            "level": "INFO",
+        }
+    },
+}
+
+
+
 
 AUTH_USER_MODEL = "users.User"
 AUTHENTICATION_BACKENDS = ['users.authentication.EmailBackend']
