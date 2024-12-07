@@ -8,6 +8,7 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from logging import getLogger
 
 # local imports
 from .serializers import UserRegisterSerializer, EmailCodeSerializer
@@ -15,6 +16,7 @@ from carts.models import Cart
 from utils.verification import generate_code, cache_email_code
 from .permissions import VerificationPermission
 
+logger = getLogger(__name__)
 User = get_user_model()
 
 
@@ -40,19 +42,23 @@ class UserRegisterView(CreateAPIView):
         serializer = self.serializer_class(data=data)
         serializer.is_valid(raise_exception=True)
 
+        # extracting validated data
+        username = serializer.validated_data.get('username')
+        password = serializer.validated_data.get('password')
+        email = serializer.validated_data.get('email')
+        logger.info(f"Serializer validation completed for username: {username}")
         # user and cart creation
-        username = serializer.data.get('username')
-        password = serializer.data.get('password')
-        email = serializer.data.get('email')
         try:
             validate_password(password=password)
             user = User.objects.create_user(username=username, password=password, email=email)
             Cart.objects.create(user=user)
             body = {'username': username, 'detail': 'User created successfully'}
             status = 201
+            logger.info(f"User and cart created successfully username: {username}, id: {user.pk}")
         except ValidationError as error:
             body = {'detail': 'Password validation failed', 'errors': error}
             status = 401
+            logger.info(f"Password validation failed for username: {username}")
 
         headers = self.get_success_headers(serializer.data)
 
@@ -66,6 +72,7 @@ class VerifyEmail(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.is_email_verified:
+            logger.info(f"A verified user requested a verification code. username: {user.username}")
             return Response(status=200, data={'message': 'Email is already verified'})
 
         # avoid too many requests
@@ -78,7 +85,7 @@ class VerifyEmail(APIView):
                                            " in GlintHub if you have not requested verification please ignore this."
                                            f"your code: {verification_code}", 'verification@glinthub.com',
                                 [user.email])
-
+            logger.info(f"Verification code emailed to user. username: {user.username}")
             return Response(status=200, data={'message': 'verification code has been emailed successfully'})
         else:
             return Response(status=400, data={'message': 'A verification code has already been sent.'
@@ -86,6 +93,7 @@ class VerifyEmail(APIView):
     def post(self, request, *args, **kwargs):
         user = request.user
         if user.is_email_verified:
+            logger.info(f"A verified user attempted to verify their email. username: {user.username}")
             return Response(status=200, data={'message': 'Email is already verified'})
 
         serializer = EmailCodeSerializer(data=request.data)
@@ -95,10 +103,7 @@ class VerifyEmail(APIView):
         if cache.get(f'verify_email_{user.id}') == code:
             user.is_email_verified = True
             user.save()
+            logger.info(f"A user verified their email. username: {user.username}")
             return Response(status=200, data={'message': 'Email has been verified successfully'})
         else:
             return Response(status=400, data={'message': 'Invalid verification code'})
-
-
-
-
