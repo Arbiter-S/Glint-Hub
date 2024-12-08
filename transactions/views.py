@@ -8,12 +8,15 @@ import requests
 from requests.exceptions import JSONDecodeError
 from drf_spectacular.utils import extend_schema_view, extend_schema, inline_serializer
 from rest_framework.serializers import IntegerField, CharField
+from logging import getLogger
 
 # Local imports
 from orders.models import Order
 from utils.order import get_order_price
 from .models import Transaction
 from orders.serializers import OrderRetrieveSerializer
+
+logger = getLogger(__name__)
 
 @extend_schema_view(
     get=extend_schema(
@@ -49,6 +52,7 @@ class PaymentInitiatorView(APIView):
         if order.total_price != current_price:
             order.total_price = current_price
             order.save()
+            logger.info(f"Order price has been updated. order id: {order.id}")
             return Response({'Message': 'Order price has been updated. Please try again.'},
                             status=HTTP_409_CONFLICT)
 
@@ -67,6 +71,7 @@ class PaymentInitiatorView(APIView):
             transaction = Transaction(authority=authority, code=code, order=order)
             transaction.save()
 
+            logger.info(f"Payment gateway successfully initiated. transaction id: {transaction.id}, order id: {order.id}")
             return Response({'status_code': code,
                              'url': f'https://sandbox.zarinpal.com/pg/StartPay/{authority}'})
         else:
@@ -76,6 +81,7 @@ class PaymentInitiatorView(APIView):
             except JSONDecodeError:
                 error= 'unknown error'
 
+            logger.error(f"Payment gateway failed to initiate for an order. order id: {order.id}, error: {error}")
             return Response({'status': 'something went wrong',
                              'errors': error})
 
@@ -107,9 +113,10 @@ class PaymentVerifierView(APIView):
             if code == 100 or code == 101: # if transaction is verified
                 order.status = 'processing'
                 order.save()
-
                 serializer = OrderRetrieveSerializer(order)
                 serializer.data['message'] = 'Payment successful'
+
+                logger.info(f"Payment verified successfully. order id: {order.id}")
                 return Response(serializer.data)
         else:
             return Response({'message': 'Payment cancelled'})
