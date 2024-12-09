@@ -1,15 +1,17 @@
 from django.core.cache import cache
 from django.db.models import F
 from redis import ConnectionError
-
+from logging import getLogger
 from products.models import Product
 
+logger = getLogger(__name__)
 
 def fetch_price():
     try:
         price = cache.get('price', 3500000)
     # redis instance is not accessible
     except ConnectionError:
+        logger.error(f'Could not fetch price from redis')
         price = 3500000
     return price
 
