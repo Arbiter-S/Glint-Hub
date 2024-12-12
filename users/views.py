@@ -46,7 +46,6 @@ class UserRegisterView(CreateAPIView):
         username = serializer.validated_data.get('username')
         password = serializer.validated_data.get('password')
         email = serializer.validated_data.get('email')
-        logger.info(f"Serializer validation completed for username: {username}")
         # user and cart creation
         try:
             validate_password(password=password)
@@ -54,11 +53,13 @@ class UserRegisterView(CreateAPIView):
             Cart.objects.create(user=user)
             body = {'username': username, 'detail': 'User created successfully'}
             status = 201
-            logger.info(f"User and cart created successfully username: {username}, id: {user.pk}")
+
+            logger.info(f"User and cart created successfully. username: {username} user_id: {user.pk}")
         except ValidationError as error:
             body = {'detail': 'Password validation failed', 'errors': error}
             status = 401
-            logger.info(f"Password validation failed for username: {username}")
+
+            logger.info(f"Password validation failed. username: {username}")
 
         headers = self.get_success_headers(serializer.data)
 
@@ -72,7 +73,7 @@ class VerifyEmail(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         if user.is_email_verified:
-            logger.info(f"A verified user requested a verification code. username: {user.username}")
+            logger.info(f"A verified user requested a verification code. user_id: {user.pk}")
             return Response(status=200, data={'message': 'Email is already verified'})
 
         # avoid too many requests
@@ -85,7 +86,7 @@ class VerifyEmail(APIView):
                                            " in GlintHub if you have not requested verification please ignore this."
                                            f"your code: {verification_code}", 'verification@glinthub.com',
                                 [user.email])
-            logger.info(f"Verification code emailed to user. username: {user.username}")
+            logger.info(f"Verification code emailed to user. user_id: {user.pk}")
             return Response(status=200, data={'message': 'verification code has been emailed successfully'})
         else:
             return Response(status=400, data={'message': 'A verification code has already been sent.'
@@ -103,7 +104,7 @@ class VerifyEmail(APIView):
         if cache.get(f'verify_email_{user.id}') == code:
             user.is_email_verified = True
             user.save()
-            logger.info(f"A user verified their email. username: {user.username}")
+            logger.info(f"A user verified their email. user_id: {user.pk}")
             return Response(status=200, data={'message': 'Email has been verified successfully'})
         else:
             return Response(status=400, data={'message': 'Invalid verification code'})
