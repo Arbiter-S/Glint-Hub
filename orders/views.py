@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from django.db import transaction
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from logging import getLogger
+from django.db import DatabaseError
 
 # Local imports
 from orders.models import Order, OrderProduct
@@ -12,7 +14,7 @@ from orders.serializers import OrderRetrieveSerializer, OrderListSerializer
 from utils.product import add_price_field
 from utils.document import authentication_401, not_found_404, bad_request_400
 
-
+logger = getLogger(__name__)
 
 @extend_schema_view(
     list=extend_schema(
@@ -83,39 +85,51 @@ class OrderViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         address = serializer.validated_data.get('address')
         note = serializer.validated_data.get('note', None)
+        try:
+            with transaction.atomic():
+                # getting the fields
+                user = self.request.user
+                cart = user.cart
+                products = add_price_field(cart.products.all())
+                cart_products = cart.cartproduct_set.all()
+                # calculating total price of the cart items
 
-        with transaction.atomic():
-            # getting the fields
-            user = self.request.user
-            cart = user.cart
-            products = add_price_field(cart.products.all())
-            cart_products = cart.cartproduct_set.all()
-            # calculating total price of the cart items
+                total_price = 0
+                for cart_product in cart_products:
+                    product_id = cart_product.product.id
+                    product = products.get(pk=product_id)
+                    quantity = cart_product.product_quantity
+                    price = product.price * quantity
+                    total_price += price
 
-            total_price = 0
-            for cart_product in cart_products:
-                product_id = cart_product.product.id
-                product = products.get(pk=product_id)
-                quantity = cart_product.product_quantity
-                price = product.price * quantity
-                total_price += price
+                order = Order(user=user, total_price=total_price, address=address, note=note)
+                order.save()
+                for cart_product in cart_products: # This section populates products field of an order
+                    # getting the price for each item in the order
+                    product_id = cart_product.product.id
+                    product = products.get(pk=product_id)
+                    price = product.price
 
-            order = Order(user=user, total_price=total_price, address=address, note=note)
-            order.save()
-            for cart_product in cart_products: # This section populates products field of an order
-                # getting the price for each item in the order
-                product_id = cart_product.product.id
-                product = products.get(pk=product_id)
-                price = product.price
+                    order_product = OrderProduct(order=order, product=cart_product.product,
+                                                 product_quantity=cart_product.product_quantity, product_price=price)
+                    order_product.save()
 
-                order_product = OrderProduct(order=order, product=cart_product.product,
-                                             product_quantity=cart_product.product_quantity, product_price=price)
-                order_product.save()
 
-            # removing all items from cart
-            cart.products.clear()
+                serializer = self.get_serializer(instance=order) # populating serializer with created object details
+                body = serializer.data
+                status_code = 201
 
-        # populating serializer with created object details
-        serializer = self.get_serializer_class()(order)
+                logger.info(f"New order created. user_id: {user.pk}, order_id: {order.pk}")
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except DatabaseError as e:
+            body = {'detail': 'Failed to create a new order'}
+            status_code = 500
+
+            logger.error(f"Failed to create a new order. error: {e}")
+
+        # removing all items from cart
+        cart.products.clear()
+
+
+
+        return Response(data=body, status=status_code)
