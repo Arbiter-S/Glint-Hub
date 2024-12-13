@@ -4,17 +4,19 @@ import os
 from dotenv import load_dotenv
 from django.core.cache import caches
 from celery import shared_task
+import logging
 
+logger = logging.getLogger(__name__)
 load_dotenv()
-
 cache = caches['docker']
 
 @shared_task
 def update_price():
     try:
-        response = requests.get(f"http://api.navasan.tech/latest/?api_key={os.getenv('API_KEY')}&item=18ayar").json()
+        response = requests.get(f"http://api.navasan.tech/latest/?api_key={os.getenv('API_KEY')}&item=18ayar")
+        response_json = response.json()
     except JSONDecodeError:
-        # TODO: Take some measures to alert the issue or prices not getting updated
+        logger.error(f"Unable to update price. status code: {response.status_code}")
         return
-    price = int(response['18ayar']['value'])
+    price = int(response_json['18ayar']['value'])
     cache.set('price', price, None)
