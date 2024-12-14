@@ -4,16 +4,18 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema, OpenApiResponse
+from logging import getLogger
 
 # Local imports
 from .models import CartProduct, Cart
 from .serializers import CartRetrieveSerializer, ProductCartSerializer, CartUpdateSerializer
 from utils.document import authentication_401, bad_request_400, not_found_404
 
+logger = getLogger(__name__)
 
 class CartViewSet(viewsets.GenericViewSet):
-
     permission_classes = [IsAuthenticated]
+
     def get_serializer_class(self, *args, **kwargs):
         if self.action == 'retrieve':
             return CartRetrieveSerializer
