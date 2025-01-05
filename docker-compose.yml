@@ -1,21 +1,65 @@
 # Avoid using a container name as it causes conflicts with containers made for testing unless you make a docker-compose for testing
 services:
+  django:
+    build: .
+    command: bash -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:8000"
+    environment:
+      - SETTINGS=${SETTINGS}
+      - SECRET_KEY=${SECRET_KEY}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - pgdb
+      - redis
+    volumes:
+      - statics:/app/static
+
+  web_server:
+    build: /nginx/
+    volumes:
+      - statics:/app/static
+    depends_on:
+      - django
+    ports:
+      - '80:80'
+
+  pgdb:
+    image: postgres:alpine3.13
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - '5432:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+    restart: on-failure
+
   redis:
     image: redis:7.0-alpine3.19
     ports:
-      - "6379:6379"
+      - '6379:6379'
 
   celery_worker:
     build: .
     command: celery -A config worker --loglevel=info
     environment:
-      - API_KEY=${API_KEY} #TODO: Apparently there is a more secure way to handle environment verbalises called secrets. Read more about it and implement it if it's not overkill.
+      - API_KEY=${API_KEY} #TODO: Apparently there is a more secure way to handle environment variables called secrets. Read more about it and implement it if it's not overkill.
+      - SETTINGS=${SETTINGS}
+      - SECRET_KEY=${SECRET_KEY}
     depends_on:
       - redis
 
   celery_beat:
     build: .
     command: celery -A config beat --loglevel=info
+    environment:
+      - SETTINGS=${SETTINGS}
+      - SECRET_KEY=${SECRET_KEY}
     depends_on:
       - celery_worker
 
+volumes:
+  db:
+  statics:

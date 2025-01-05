@@ -2,13 +2,12 @@ import requests
 from requests.exceptions import JSONDecodeError
 import os
 from dotenv import load_dotenv
-from django.core.cache import caches
 from celery import shared_task
 import logging
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 load_dotenv()
-cache = caches['docker']
 
 @shared_task
 def update_price():
