@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from datetime import timedelta
 import os
@@ -124,6 +125,7 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # logging configuration
+#TODO: logging in general have still so much room for improvment
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -132,17 +134,21 @@ LOGGING = {
             "()": "django.utils.log.RequireDebugTrue",
         },
     },
-    'formatters': {
-        'simple': {
-            'format': '[{asctime}] {levelname} {message}',
-            'datefmt': '%d/%b/%Y:%H:%M:%S %z',
-            'style': '{',
+    "formatters": {
+        "simple": {
+            "format": "[{asctime}] {levelname} {message} {name}",
+            "datefmt": "%d/%b/%Y:%H:%M:%S %z",
+            "style": "{",
+        },
+        "simple_gunicorn": {
+            "format": "{levelname} {message} {name}",
+            "style": "{",
         },
     },
     "handlers": {
         "console": {
             "level": "INFO",
-            "filters": ["require_debug_true",],
+            "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
             "formatter": "simple"
         },
@@ -152,18 +158,29 @@ LOGGING = {
             "filename": "logs/django_general.log",
             "formatter": "simple",
         },
-        "django_server": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "filename": "logs/django_server.log",
-            "formatter": "simple",
-        },
         "root_file": {
             "level": "INFO",
             "class": "logging.FileHandler",
             "filename": "logs/root.log",
             "formatter": "simple",
-        }
+        },
+        # gunicorn related handlers
+        "console_gunicorn": {
+            "level": "INFO",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
+            "formatter": "simple_gunicorn",
+        },
+        "gunicorn_access": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "logs/gunicorn_access.log",
+        },
+        "gunicorn_error": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "logs/gunicorn_error.log",
+        },
     },
     "loggers": {
         "django": {
@@ -171,16 +188,18 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
-        "django.server": {
-            "handlers": ["django_server", "console"],
+        "gunicorn.access": {
+            "handlers": ["gunicorn_access", "console_gunicorn"],
             "level": "INFO",
             "propagate": False,
         },
-        '': {
-            "handlers": ["root_file", "console"],
+        "gunicorn.error": {
             "level": "INFO",
-        }
+            "handlers": ["gunicorn_error", "console_gunicorn"],
+            "propagate": False,
+        },
     },
+    "root": {"handlers": ["root_file", "console"], "level": "INFO",}
 }
 
 
@@ -190,10 +209,12 @@ AUTHENTICATION_BACKENDS = ['users.authentication.EmailBackend']
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'DEFAULT_PARSER_CLASSES': ['rest_framework.parsers.JSONParser']
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
 }
 
 SPECTACULAR_SETTINGS = {

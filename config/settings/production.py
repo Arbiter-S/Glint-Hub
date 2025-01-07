@@ -1,4 +1,3 @@
-import os
 from .base import *
 from os import getenv
 from dotenv import load_dotenv
@@ -22,3 +21,6 @@ DATABASES = {
         'PORT': '5432',
     },
 }
+
+# Removing DRF browsable API
+REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].remove('rest_framework.renderers.BrowsableAPIRenderer')

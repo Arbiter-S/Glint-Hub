@@ -2,7 +2,7 @@
 services:
   django:
     build: .
-    command: bash -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:8000"
+    command: bash -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:8000 --access-logfile - --error-logfile -"
     environment:
       - SETTINGS=${SETTINGS}
       - SECRET_KEY=${SECRET_KEY}
