@@ -220,7 +220,7 @@ REST_FRAMEWORK = {
 SPECTACULAR_SETTINGS = {
     'TITLE': 'GlintHub',
     'DESCRIPTION': 'GlintHub is an API to manage an online shop selling gold related products',
-    'VERSION': '0.2.0',
+    'VERSION': '0.9.0',
     'AUTHENTICATION_WHITELIST': ['rest_framework_simplejwt.authentication.JWTAuthentication', ],
 }
 
