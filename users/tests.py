@@ -43,13 +43,9 @@ def test_registration_successful():
     qs = User.objects.filter(email='johndoe@example.com')
     assert qs.exists()
 
-@pytest.fixture(scope="session")
-def docker_compose_file():
-    return r"D:\Projects\Python\GlintHub\docker-compose.yml"
 
 @pytest.mark.django_db
-@pytest.mark.docker
-def test_email_verification_initiate_successful(docker_services):
+def test_email_verification_initiate_successful():
     client = APIClient()
     user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
     client.force_authenticate(user)
@@ -67,7 +63,7 @@ def test_email_verification_initiate_already_verified():
     assert response.status_code == 200
 
 @pytest.fixture(scope="function")
-def code_generation(docker_services):
+def code_generation():
     client = APIClient()
     user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
     client.force_authenticate(user)
@@ -76,7 +72,6 @@ def code_generation(docker_services):
     return user, client
 
 @pytest.mark.django_db
-@pytest.mark.docker
 def test_email_verification_confirmation_successful(code_generation):
     user, client = code_generation
     code = cache_instance.get(f'verify_email_{user.id}')
@@ -87,7 +82,6 @@ def test_email_verification_confirmation_successful(code_generation):
     assert user.is_email_verified is True
 
 @pytest.mark.django_db
-@pytest.mark.docker
 def test_email_verification_confirmation_failure(code_generation):
     user, client = code_generation
     body = {'code': randbelow(900000) + 100000} # TODO: Should I make sure codes aren't the same?(1 in 900000)

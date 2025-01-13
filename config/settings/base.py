@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 from datetime import timedelta
 import os
@@ -73,10 +72,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': 'pgdb',
+        'PORT': '5432',
+    },
 }
 
 # Password validation
@@ -281,7 +284,7 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 #SMTP configuration
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 2525
+EMAIL_HOST = 'smtp_dev'
+EMAIL_PORT = 25
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''

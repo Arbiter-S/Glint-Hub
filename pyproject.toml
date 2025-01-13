@@ -22,7 +22,6 @@ redis = "^5.2.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.3"
-pytest-docker = "^3.1.1"
 faker = "^33.1.0"
 pytest-django = "^4.9.0"
 
@@ -42,9 +41,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 python_files = 'tests.py'
 required_plugins = 'pytest-django'
-DJANGO_SETTINGS_MODULE = 'config.settings.development' # pytest-django required settings
-markers = [
-    "docker: Tests that need docker containers to run."
-]
+DJANGO_SETTINGS_MODULE = 'config.settings.test' # pytest-django required settings
 #TODO: Tried converage using pytest-cov and it doesn't play well with pytest-django. Check later using the coverage library
 # or alternative libraries

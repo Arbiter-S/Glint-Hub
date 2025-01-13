@@ -14,12 +14,12 @@ a robust solution for modern e-commerce needs.
    cd Glint-Hub 
    ```
    
-2. **Environment Variables**
-The following environment variables are required to run the application:  
+The following environment variables are required to run the application:
 
 - `API_KEY` - API key to use for a third party service to fetch gold price. Check [this](https://www.navasan.tech/api/) for more info. (Optional: Default values for gold price have been implemented.) 
-- `SETTINGS` - The mode to run the project in. You can either set "DEV" or "PRO" which changes the settings file to use. (Optional: Development settings are used by default.)
-- `SECRET_KEY` - The secret key for Django
+- `SETTINGS` - The mode to run the project in. You can either set "DEV" for development or "PRO" for production which 
+changes the settings file to use. (Optional: Development settings are used by default.)
+- `SECRET_KEY` - The secret key for Django. This value is not required if you are in development mode.
 - `DB_NAME` - The name of the database 
 - `DB_USER` - The database username
 - `DB_PASSWORD` - The database password
@@ -42,7 +42,25 @@ GlintHub provides comprehensive API documentation:
   `http://localhost/api/docs/`
 
 
+## Testing
+In this project, tests are run inside the Django container. Here's how to execute them:
 
+- For **Windows**:
+  
+  Run the following command in powershell in project's root:
+    ```powershell
+    docker-compose up -d; docker-compose exec django pytest -vv; docker-compose down
+    ```
+
+- For **Linux(Bash or Zsh)**:
+
+    Run the following command in the terminal in project's root:
+    ```bash
+    docker-compose up -d && docker-compose exec django pytest -vv && docker-compose down
+    ```
+
+These commands will start the containers, execute the tests inside the Django container, and then shut down the
+containers when the tests are complete.
 ## Contributing
 Contributions are welcome! Feel free to submit issues or pull requests.
 

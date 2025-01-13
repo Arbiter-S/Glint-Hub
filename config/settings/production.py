@@ -11,16 +11,5 @@ ALLOWED_HOSTS = ['*'] # nginx handles host header attacks but better change it t
 
 SECRET_KEY = getenv('SECRET_KEY')
 
-DATABASES = {
-    "default": {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'pgdb',
-        'PORT': '5432',
-    },
-}
-
 # Removing DRF browsable API
 REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'].remove('rest_framework.renderers.BrowsableAPIRenderer')

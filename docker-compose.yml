@@ -60,6 +60,12 @@ services:
     depends_on:
       - celery_worker
 
+  smtp_dev:
+      image: rnwood/smtp4dev
+      ports:
+        - "5000:80" # user interface
+
+
 volumes:
   db:
   statics:
