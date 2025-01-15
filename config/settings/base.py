@@ -128,7 +128,7 @@ MEDIA_URL = '/media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # logging configuration
-#TODO: logging in general have still so much room for improvment
+#TODO: logging in general have still so much room for improvement
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

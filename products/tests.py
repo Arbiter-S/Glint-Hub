@@ -1,42 +1,15 @@
-from rest_framework.test import APIClient
-from django.urls import reverse
-import pytest
-from products.models import Product
-from faker import Faker
 import random
+
+import pytest
+from django.urls import reverse
+from faker import Faker
+
+from products.models import Product
 from products.views import ProductViewSet
 
 fake = Faker()
 
-@pytest.fixture()
-def create_products():
-    """
-    A fixture which makes 50 dummy instances
-
-    Returns: A list containing the dummy products
-    """
-    categories = ["necklace", "bracelet", "watch", "earring"]
-
-    products = []
-
-    for _ in range(50):
-        product = Product.objects.create(
-            name=fake.word().capitalize(),
-            description=fake.text(max_nb_chars=200),
-            weight=round(random.uniform(0.1, 99.99), 2),
-            color=fake.color_name(),
-            in_stock=random.randint(0, 100),
-            category=random.choice(categories),
-            purity=18,
-            picture=None,
-        )
-        products.append(product)
-
-    return products
-
-
-def test_products_method_not_allowed():
-    client = APIClient()
+def test_products_method_not_allowed(client):
     response = client.post(reverse('Product-list'))
     assert response.status_code == 405
     response = client.put(reverse('Product-list'))
@@ -48,22 +21,19 @@ def test_products_method_not_allowed():
 
 
 @pytest.mark.django_db
-def test_products_list_successful(create_products):
-    client = APIClient()
+def test_products_list_successful(client, create_products):
     response = client.get(reverse('Product-list'), format='json')
     assert response.status_code == 200
     assert response.json()['count'] == Product.objects.all().count()
 
 @pytest.mark.django_db
-def test_products_list_pagination(create_products):
-    client = APIClient()
+def test_products_list_pagination(client, create_products):
     response = client.get(reverse('Product-list'), format='json')
     assert len(response.json()['results']) == ProductViewSet.ProductPagination.page_size
 
 @pytest.mark.parametrize('ordering', ['price', 'created_at', '-price', '-created_at'])
 @pytest.mark.django_db
-def test_products_list_ordering(create_products, ordering):
-    client = APIClient()
+def test_products_list_ordering(client, create_products, ordering):
     response = client.get(reverse('Product-list') + f'?ordering={ordering}', format='json')
     assert response.status_code == 200
 
@@ -79,8 +49,7 @@ def test_products_list_ordering(create_products, ordering):
 
 
 @pytest.mark.django_db
-def test_products_retrieve_successful(create_products):
-    client = APIClient()
+def test_products_retrieve_successful(client, create_products):
     for _ in range(3):
         product = random.choice(create_products)
         response = client.get(reverse('Product-detail', kwargs={'pk': product.pk}), format='json')
@@ -99,8 +68,7 @@ def test_products_retrieve_successful(create_products):
 
 
 @pytest.mark.django_db
-def test_products_not_found(create_products):
-    client = APIClient()
+def test_products_not_found(client, create_products):
     response = client.get(reverse('Product-detail', kwargs={'pk': 51}), format='json')
     assert response.status_code == 404
     assert response.json() == {"detail": "No Product matches the given query."}

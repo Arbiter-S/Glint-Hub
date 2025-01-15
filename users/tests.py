@@ -10,8 +10,7 @@ User = get_user_model()
 
 @pytest.mark.parametrize('password', ['asdfghjk', 'prj8', 951983354])
 @pytest.mark.django_db
-def test_register_with_weak_password(password):
-    client = APIClient()
+def test_register_with_weak_password(client, password):
     body = {
         'username': 'SomeRandomName',
         'password': password,
@@ -27,8 +26,7 @@ def test_register_with_weak_password(password):
     assert response.status_code == 401
     assert response.json().get('errors')[0] == errors[password]
 @pytest.mark.django_db
-def test_registration_successful():
-    client = APIClient()
+def test_registration_successful(client):
     body = {
         'username': 'JohnDoe',
         'password': 'StrongPassword123!',
@@ -45,16 +43,14 @@ def test_registration_successful():
 
 
 @pytest.mark.django_db
-def test_email_verification_initiate_successful():
-    client = APIClient()
+def test_email_verification_initiate_successful(client):
     user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
     client.force_authenticate(user)
     response = client.get(reverse('EmailVerification', kwargs={'user_id': user.id}))
     assert response.json() == {'message': 'verification code has been emailed successfully'}
 
 @pytest.mark.django_db
-def test_email_verification_initiate_already_verified():
-    client = APIClient()
+def test_email_verification_initiate_already_verified(client):
     user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
     user.is_email_verified = True
     client.force_authenticate(user)
@@ -63,17 +59,16 @@ def test_email_verification_initiate_already_verified():
     assert response.status_code == 200
 
 @pytest.fixture(scope="function")
-def code_generation():
-    client = APIClient()
+def code_generation(client):
     user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
     client.force_authenticate(user)
     response = client.get(reverse('EmailVerification', kwargs={'user_id': user.id}))
     assert cache_instance.get(f'verify_email_{user.id}') is not None
-    return user, client
+    return user
 
 @pytest.mark.django_db
-def test_email_verification_confirmation_successful(code_generation):
-    user, client = code_generation
+def test_email_verification_confirmation_successful(client, code_generation):
+    user = code_generation
     code = cache_instance.get(f'verify_email_{user.id}')
     body = {'code': code}
     response = client.post(reverse('EmailVerification', kwargs={'user_id': user.id}), body, format='json')
@@ -82,8 +77,8 @@ def test_email_verification_confirmation_successful(code_generation):
     assert user.is_email_verified is True
 
 @pytest.mark.django_db
-def test_email_verification_confirmation_failure(code_generation):
-    user, client = code_generation
+def test_email_verification_confirmation_failure(client, code_generation):
+    user = code_generation
     body = {'code': randbelow(900000) + 100000} # TODO: Should I make sure codes aren't the same?(1 in 900000)
     response = client.post(reverse('EmailVerification', kwargs={'user_id': user.id}), body, format='json')
     assert response.status_code == 400
