@@ -1,0 +1,37 @@
+#TODO: See if you can have .env within the root directory instead of Docker
+services:
+  redis:
+    image: redis:7.0-alpine3.19
+    ports:
+      - "6379:6379"
+
+  celery_worker:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    command: celery -A config worker --loglevel=info
+    environment:
+      - API_KEY=${API_KEY}
+      - SETTINGS=${SETTINGS}
+      - SECRET_KEY=${SECRET_KEY}
+    env_file: .env
+    depends_on:
+      - redis
+
+  celery_beat:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    command: celery -A config beat --loglevel=info
+    environment:
+      - SETTINGS=${SETTINGS}
+      - SECRET_KEY=${SECRET_KEY}
+    env_file: .env
+    depends_on:
+      - celery_worker
+
+  smtp_dev:
+      image: rnwood/smtp4dev
+      ports:
+        - "5000:80" # user interface
+        - "2525:25"

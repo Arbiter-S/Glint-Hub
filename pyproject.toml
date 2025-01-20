@@ -41,6 +41,6 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 python_files = 'tests.py'
 required_plugins = 'pytest-django'
-DJANGO_SETTINGS_MODULE = 'config.settings.test' # pytest-django required settings
+DJANGO_SETTINGS_MODULE = 'config.settings.development' # pytest-django required settings
 #TODO: Tried converage using pytest-cov and it doesn't play well with pytest-django. Check later using the coverage library
 # or alternative libraries

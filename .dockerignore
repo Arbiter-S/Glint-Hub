@@ -1,5 +1,7 @@
 .idea
-.env
+Docker/.env
 venv
 db.sqlite3
 logs/*.log
+.git
+README.md

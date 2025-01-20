@@ -3,6 +3,9 @@
 import os
 import sys
 from utils.generic import fetch_settings
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="Docker/.env")
 
 # Making logs directory to avoid errors by the loggers
 script_dir = os.path.dirname(os.path.realpath(__file__))

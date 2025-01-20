@@ -1,7 +1,5 @@
-from dotenv import load_dotenv
 import os
 
-load_dotenv()
 
 
 def fetch_settings():
@@ -11,4 +9,5 @@ def fetch_settings():
     }
 
     environment = settings.get(os.getenv("SETTINGS"), "development")
+
     return environment
