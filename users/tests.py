@@ -46,7 +46,7 @@ def test_registration_successful(client):
 def test_email_verification_initiate_successful(client):
     user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
     client.force_authenticate(user)
-    response = client.get(reverse('EmailVerification', kwargs={'user_id': user.id}))
+    response = client.get(reverse('EmailVerification'))
     assert response.json() == {'message': 'verification code has been emailed successfully'}
 
 @pytest.mark.django_db
@@ -54,7 +54,7 @@ def test_email_verification_initiate_already_verified(client):
     user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
     user.is_email_verified = True
     client.force_authenticate(user)
-    response = client.get(reverse('EmailVerification', kwargs={'user_id': user.id}))
+    response = client.get(reverse('EmailVerification'))
     assert response.json() == {"message": "Email is already verified"}
     assert response.status_code == 200
 
@@ -62,7 +62,7 @@ def test_email_verification_initiate_already_verified(client):
 def code_generation(client):
     user = User.objects.create_user(username='JohnDoe', password='StrongPassword123!', email='johndoe@example.com')
     client.force_authenticate(user)
-    response = client.get(reverse('EmailVerification', kwargs={'user_id': user.id}))
+    response = client.get(reverse('EmailVerification'))
     assert cache_instance.get(f'verify_email_{user.id}') is not None
     return user
 
@@ -71,7 +71,7 @@ def test_email_verification_confirmation_successful(client, code_generation):
     user = code_generation
     code = cache_instance.get(f'verify_email_{user.id}')
     body = {'code': code}
-    response = client.post(reverse('EmailVerification', kwargs={'user_id': user.id}), body, format='json')
+    response = client.post(reverse('EmailVerification'), body, format='json')
     assert response.status_code == 200
     assert response.json() == {'message': 'Email has been verified successfully'}
     assert user.is_email_verified is True
@@ -80,7 +80,7 @@ def test_email_verification_confirmation_successful(client, code_generation):
 def test_email_verification_confirmation_failure(client, code_generation):
     user = code_generation
     body = {'code': randbelow(900000) + 100000} # TODO: Should I make sure codes aren't the same?(1 in 900000)
-    response = client.post(reverse('EmailVerification', kwargs={'user_id': user.id}), body, format='json')
+    response = client.post(reverse('EmailVerification'), body, format='json')
     assert response.status_code == 400
     assert response.json() == {'message': 'Invalid verification code'}
     assert user.is_email_verified is False

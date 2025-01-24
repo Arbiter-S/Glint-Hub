@@ -14,7 +14,6 @@ from logging import getLogger
 from .serializers import UserRegisterSerializer, EmailCodeSerializer
 from carts.models import Cart
 from utils.verification import generate_code, cache_email_code
-from .permissions import VerificationPermission
 
 logger = getLogger(__name__)
 User = get_user_model()
@@ -68,7 +67,7 @@ class UserRegisterView(CreateAPIView):
 
 
 class VerifyEmail(APIView):
-    permission_classes = [IsAuthenticated, VerificationPermission]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         user = request.user

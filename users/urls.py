@@ -6,5 +6,5 @@ urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='RegisterView'),
     path('login/', TokenObtainPairView.as_view(), name='tokenObtain'),
     path('login-refresh/', TokenRefreshView.as_view(), name='tokenRefresh'),
-    path('verify-email/<int:user_id>/', VerifyEmail.as_view(), name='EmailVerification'),
+    path('verify-email/', VerifyEmail.as_view(), name='EmailVerification'),
 ]
