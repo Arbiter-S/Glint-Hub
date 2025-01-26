@@ -8,7 +8,9 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.serializers import CharField, ListField
 from logging import getLogger
+from drf_spectacular.utils import extend_schema_view, extend_schema, inline_serializer
 
 # local imports
 from .serializers import UserRegisterSerializer, EmailCodeSerializer
@@ -21,19 +23,51 @@ User = get_user_model()
 
 # TODO: Simple JWT has a listed security issue. Learn more about it and see if you can find an alternative
 
+@extend_schema_view(
+    post=extend_schema(
+        summary="Register new user",
+        description="""This endpoint creates a new user instance and assigns a cart instance to it.
+        The password goes through default Django password validators before it can be used. Check this link for more info
+        https://docs.djangoproject.com/en/5.0/topics/auth/passwords/#s-enabling-password-validation""",
+        responses={
+            201: inline_serializer(
+                name="UserCreationSuccessResponse",
+                fields={
+                    "username": CharField(),
+                    "detail": CharField(default='User created successfully'),
+                }
+            ),
+            400: inline_serializer(
+                name="UserCreationBadRequestResponse",
+                fields={
+                    "field_name": CharField(default='user with this {field_name} already exists.'),
+                }
+            ),
+            401: inline_serializer(
+                name="UserCreationUnauthorizedResponse",
+                fields={
+                    "detail": CharField(default='Password validation failed'),
+                    "errors": ListField(
+                        child=CharField()
+                    )
+                }
+            )
+        }
+    )
+)
 class UserRegisterView(CreateAPIView):
-    """
-    Creates a new User object.
-
-    Request Body:
-        username (str): username for the new user
-        password (str): password for the new user
-
-    Returns:
-        201 Created: Username and a success message
-        400 Bad Request: If the username is not unique.
-        401 Unauthorized: If password is not validated.
-    """
+    # """
+    # Creates a new User object.
+    #
+    # Request Body:
+    #     username (str): username for the new user
+    #     password (str): password for the new user
+    #
+    # Returns:
+    #     201 Created: Username and a success message
+    #     400 Bad Request: If the username is not unique.
+    #     401 Unauthorized: If password is not validated.
+    # """
     serializer_class = UserRegisterSerializer
 
     def create(self, request, *args, **kwargs):

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: GlintHub
-  version: 0.2.0
+  version: 0.9.0
   description: GlintHub is an API to manage an online shop selling gold related products
 paths:
   /api/docs/:
@@ -20,110 +20,6 @@ paths:
           enum:
           - json
           - yaml
-      - in: query
-        name: lang
-        schema:
-          type: string
-          enum:
-          - af
-          - ar
-          - ar-dz
-          - ast
-          - az
-          - be
-          - bg
-          - bn
-          - br
-          - bs
-          - ca
-          - ckb
-          - cs
-          - cy
-          - da
-          - de
-          - dsb
-          - el
-          - en
-          - en-au
-          - en-gb
-          - eo
-          - es
-          - es-ar
-          - es-co
-          - es-mx
-          - es-ni
-          - es-ve
-          - et
-          - eu
-          - fa
-          - fi
-          - fr
-          - fy
-          - ga
-          - gd
-          - gl
-          - he
-          - hi
-          - hr
-          - hsb
-          - hu
-          - hy
-          - ia
-          - id
-          - ig
-          - io
-          - is
-          - it
-          - ja
-          - ka
-          - kab
-          - kk
-          - km
-          - kn
-          - ko
-          - ky
-          - lb
-          - lt
-          - lv
-          - mk
-          - ml
-          - mn
-          - mr
-          - ms
-          - my
-          - nb
-          - ne
-          - nl
-          - nn
-          - os
-          - pa
-          - pl
-          - pt
-          - pt-br
-          - ro
-          - ru
-          - sk
-          - sl
-          - sq
-          - sr
-          - sr-latn
-          - sv
-          - sw
-          - ta
-          - te
-          - tg
-          - th
-          - tk
-          - tr
-          - tt
-          - udm
-          - ug
-          - uk
-          - ur
-          - uz
-          - vi
-          - zh-hans
-          - zh-hant
       tags:
       - api
       security:
@@ -643,17 +539,6 @@ paths:
   /users/register/:
     post:
       operationId: users_register_create
-      description: |-
-        Creates a new User object.
-
-        Request Body:
-            username (str): username for the new user
-            password (str): password for the new user
-
-        Returns:
-            201 Created: Username and a success message
-            400 Bad Request: If the username is not unique.
-            401 Unauthorized: If password is not validated.
       tags:
       - users
       requestBody:
@@ -678,15 +563,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserRegister'
           description: ''
-  /users/verify-email/{id}/:
+  /users/verify-email/:
     get:
       operationId: users_verify_email_retrieve
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        required: true
       tags:
       - users
       security:
@@ -696,12 +575,6 @@ paths:
           description: No response body
     post:
       operationId: users_verify_email_create
-      parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        required: true
       tags:
       - users
       security:

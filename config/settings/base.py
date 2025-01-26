@@ -198,6 +198,9 @@ REST_FRAMEWORK = {
     ],
 }
 
+# TODO: spectacular has too much boiler plate code with many warnings even if you schema is accurate. Try to solve them.
+
+
 SPECTACULAR_SETTINGS = {
     'TITLE': 'GlintHub',
     'DESCRIPTION': 'GlintHub is an API to manage an online shop selling gold related products',
