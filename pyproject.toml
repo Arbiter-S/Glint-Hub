@@ -32,6 +32,7 @@ psycopg2-binary = "^2.9.10"
 
 [tool.poetry.group.development.dependencies]
 django-debug-toolbar = "^4.4.6"
+pre-commit = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core"]

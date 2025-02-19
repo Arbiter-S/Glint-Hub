@@ -2,14 +2,14 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-from utils.generic import fetch_settings
 from dotenv import load_dotenv
+from utils.generic import fetch_settings
 
 load_dotenv(dotenv_path="Docker/.env")
 
 # Making logs directory to avoid errors by the loggers
 script_dir = os.path.dirname(os.path.realpath(__file__))
-log_dir = os.path.join(script_dir, 'logs')
+log_dir = os.path.join(script_dir, "logs")
 os.makedirs(log_dir, exist_ok=True)
 
 
@@ -18,7 +18,7 @@ settings = fetch_settings()
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'config.settings.{settings}')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{settings}")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -30,5 +30,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -5,23 +5,23 @@ from django.db import models
 # local imports
 from products.models import Product
 
-
 User = get_user_model()
+
 
 class Order(models.Model):
     statuses = [
-        ('pending', 'Pending'),
-        ('processing', 'Processing'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-        ('cancelled', 'Cancelled'),
-        ('invalid', 'Invalid'),
+        ("pending", "Pending"),
+        ("processing", "Processing"),
+        ("shipped", "Shipped"),
+        ("delivered", "Delivered"),
+        ("cancelled", "Cancelled"),
+        ("invalid", "Invalid"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     total_price = models.IntegerField()
-    status = models.CharField(max_length=15, choices=statuses, default='pending')
-    products = models.ManyToManyField(Product, through='OrderProduct')
+    status = models.CharField(max_length=15, choices=statuses, default="pending")
+    products = models.ManyToManyField(Product, through="OrderProduct")
     tracking_number = models.CharField(max_length=25, null=True, blank=True)
     address = models.TextField()
     note = models.TextField(blank=True, null=True)

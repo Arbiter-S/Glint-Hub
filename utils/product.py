@@ -1,17 +1,18 @@
 from django.core.cache import cache
 from django.db.models import F
-from redis import ConnectionError
 from logging import getLogger
 from products.models import Product
+from redis import ConnectionError
 
 logger = getLogger(__name__)
 
+
 def fetch_price():
     try:
-        price = cache.get('price', 3500000)
+        price = cache.get("price", 3500000)
     # redis instance is not accessible
     except ConnectionError:
-        logger.error(f'Could not fetch price from redis')
+        logger.error(f"Could not fetch price from redis")
         price = 3500000
     return price
 
@@ -30,9 +31,9 @@ def add_price_field(queryset=None):
     price_per_gram = fetch_price()
 
     if queryset:
-        qs = queryset.annotate(price=F('weight') * price_per_gram)
+        qs = queryset.annotate(price=F("weight") * price_per_gram)
 
     else:
-        qs = Product.objects.annotate(price=F('weight') * price_per_gram)
+        qs = Product.objects.annotate(price=F("weight") * price_per_gram)
     return qs
     # TODO: Make price field an integer

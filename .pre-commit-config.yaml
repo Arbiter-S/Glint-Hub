@@ -1,0 +1,13 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.8.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.10.1
+    hooks:
+      - id: isort
+        args: [ "--line-length=88", "--no-sections", "--profile", "black"]
+
+  #TODO: Maybe add mypy after you refactored the whole project since it depends heavily on type hints

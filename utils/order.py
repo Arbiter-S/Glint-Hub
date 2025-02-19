@@ -1,6 +1,6 @@
-from utils.product import add_price_field
-from orders.models import Order
 from django.core.cache import cache
+from orders.models import Order
+from utils.product import add_price_field
 
 
 def get_order_price(order_instance: Order) -> int:
@@ -24,9 +24,4 @@ def get_order_price(order_instance: Order) -> int:
         price = product.price * quantity
         total_price += price
 
-
     return total_price
-
-
-
-    

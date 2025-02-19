@@ -1,27 +1,31 @@
 # 3rd party library imports
+# Local imports
+from .models import Cart, CartProduct
+from .serializers import (
+    CartRetrieveSerializer,
+    CartUpdateSerializer,
+    ProductCartSerializer,
+)
+from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiResponse, extend_schema
+from logging import getLogger
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status, viewsets
-from django.shortcuts import get_object_or_404
-from drf_spectacular.utils import extend_schema, OpenApiResponse
-from logging import getLogger
-
-# Local imports
-from .models import CartProduct, Cart
-from .serializers import CartRetrieveSerializer, ProductCartSerializer, CartUpdateSerializer
 from utils.document import authentication_401, bad_request_400, not_found_404
 
 logger = getLogger(__name__)
+
 
 class CartViewSet(viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self, *args, **kwargs):
-        if self.action == 'retrieve':
+        if self.action == "retrieve":
             return CartRetrieveSerializer
-        elif self.action == 'create':
+        elif self.action == "create":
             return ProductCartSerializer
-        elif self.action == 'update':
+        elif self.action == "update":
             return CartUpdateSerializer
 
     @extend_schema(
@@ -31,10 +35,9 @@ class CartViewSet(viewsets.GenericViewSet):
         This endpoint requires authentication.
         """,
         responses={
-            200:CartRetrieveSerializer,
-            401:authentication_401(),
-        }
-
+            200: CartRetrieveSerializer,
+            401: authentication_401(),
+        },
     )
     def retrieve(self, request, *args, **kwargs):
         cart = Cart.objects.get(user=self.request.user)
@@ -49,19 +52,22 @@ class CartViewSet(viewsets.GenericViewSet):
         """,
         request=ProductCartSerializer,
         responses={
-            201:ProductCartSerializer,
-            400:bad_request_400(),
-            401:authentication_401(),
-            500:OpenApiResponse(response=None, description="Product is already in the cart or"
-                                                             " product with that id does not exist")
-        }
+            201: ProductCartSerializer,
+            400: bad_request_400(),
+            401: authentication_401(),
+            500: OpenApiResponse(
+                response=None,
+                description="Product is already in the cart or"
+                " product with that id does not exist",
+            ),
+        },
     )
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = request.user
         cart = Cart.objects.get(user=user)
-        serializer.validated_data['cart'] = cart
+        serializer.validated_data["cart"] = cart
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -72,12 +78,13 @@ class CartViewSet(viewsets.GenericViewSet):
         This endpoint requires authentication.
         """,
         responses={
-            204:None,
-            401:authentication_401(),
-            404:not_found_404('CartProduct')
-        })
+            204: None,
+            401: authentication_401(),
+            404: not_found_404("CartProduct"),
+        },
+    )
     def destroy(self, request, *args, **kwargs):
-        product_id = kwargs.get('product_id')
+        product_id = kwargs.get("product_id")
         cart = Cart.objects.get(user=self.request.user)
         instance = get_object_or_404(CartProduct, product=product_id, cart=cart)
         instance.delete()
@@ -90,14 +97,16 @@ class CartViewSet(viewsets.GenericViewSet):
         This endpoint requires authentication.""",
         request=CartUpdateSerializer,
         responses={
-            200:CartUpdateSerializer,
-            400:bad_request_400(),
-            401:authentication_401(),
-            404:not_found_404('CartProduct')
-        }
+            200: CartUpdateSerializer,
+            400: bad_request_400(),
+            401: authentication_401(),
+            404: not_found_404("CartProduct"),
+        },
     )
-    def update(self, request, *args, **kwargs): # TODO: Check if patch requests with no body should return a 400 error
-        product_id = kwargs.get('product_id')
+    def update(
+        self, request, *args, **kwargs
+    ):  # TODO: Check if patch requests with no body should return a 400 error
+        product_id = kwargs.get("product_id")
         cart = Cart.objects.get(user=self.request.user)
         instance = get_object_or_404(CartProduct, product=product_id, cart=cart)
         serializer = self.get_serializer(instance, data=request.data, partial=True)

@@ -1,20 +1,21 @@
 # 3rd party imports
-from rest_framework import serializers
-
 # local imports
 from .models import Cart, CartProduct
 from products.models import Product
 from products.serializers import ProductSerializer
+from rest_framework import serializers
 
 
 def validate_product_quantity(self, value):
     if value < 1:
         raise serializers.ValidationError("Quantity should be at least 1")
 
-    product_id = self.initial_data['product_id']
+    product_id = self.initial_data["product_id"]
     product_instance = Product.objects.get(pk=product_id)
     if product_instance.in_stock is not None and product_instance.in_stock < value:
-        raise serializers.ValidationError(f"Only {product_instance.in_stock} units available")
+        raise serializers.ValidationError(
+            f"Only {product_instance.in_stock} units available"
+        )
     return value
 
 
@@ -26,24 +27,26 @@ class ProductCartSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartProduct
-        fields = ['product_id', 'product_quantity', 'product']
+        fields = ["product_id", "product_quantity", "product"]
 
     def validate_product_quantity(self, value):
         return validate_product_quantity(self, value)
 
+
 class CartRetrieveSerializer(serializers.ModelSerializer):
-    items = ProductCartSerializer(many=True, read_only=True, source='cartproduct_set')
+    items = ProductCartSerializer(many=True, read_only=True, source="cartproduct_set")
 
     class Meta:
         model = Cart
-        fields = ['items']
+        fields = ["items"]
+
 
 class CartUpdateSerializer(serializers.ModelSerializer):
     product_quantity = serializers.IntegerField(min_value=1, required=True)
 
     class Meta:
         model = CartProduct
-        fields = ['product_quantity']
+        fields = ["product_quantity"]
 
     def validate_product_quantity(self, value):
         return validate_product_quantity(self, value)

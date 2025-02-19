@@ -1,7 +1,6 @@
 import os
 
 
-
 def fetch_settings():
     settings = {
         "PRO": "production",

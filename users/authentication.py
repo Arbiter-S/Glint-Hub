@@ -4,7 +4,6 @@ from django.db.models import Q
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-
 User = get_user_model()
 
 
@@ -17,7 +16,9 @@ class EmailBackend(ModelBackend):
             return
         try:
             # checks whether there is a user with the same username or email
-            user = User.objects.get(Q(username__iexact=username) | Q(email__iexact=username))
+            user = User.objects.get(
+                Q(username__iexact=username) | Q(email__iexact=username)
+            )
         except User.DoesNotExist:
             User().set_password(password)
         else:

@@ -13,6 +13,6 @@ from utils.generic import fetch_settings
 
 settings = fetch_settings()
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', f'config.settings.{settings}')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"config.settings.{settings}")
 
 application = get_asgi_application()

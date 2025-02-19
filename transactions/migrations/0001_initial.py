@@ -9,18 +9,31 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('orders', '0006_order_note'),
+        ("orders", "0006_order_note"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Transaction',
+            name="Transaction",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.SmallIntegerField()),
-                ('card_num', models.CharField(max_length=16)),
-                ('reference_id', models.IntegerField(blank=True, null=True)),
-                ('order', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='orders.order')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("code", models.SmallIntegerField()),
+                ("card_num", models.CharField(max_length=16)),
+                ("reference_id", models.IntegerField(blank=True, null=True)),
+                (
+                    "order",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.PROTECT, to="orders.order"
+                    ),
+                ),
             ],
         ),
     ]

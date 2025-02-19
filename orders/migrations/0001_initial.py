@@ -7,27 +7,59 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Order',
+            name="Order",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('total_price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('processing', 'Processing'), ('shipped', 'Shipped'), ('delivered', 'Delivered'), ('cancelled', 'Cancelled'), ('invalid', 'Invalid')], default='pending', max_length=15)),
-                ('tracking_number', models.CharField(blank=True, max_length=25, null=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("total_price", models.DecimalField(decimal_places=2, max_digits=10)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("processing", "Processing"),
+                            ("shipped", "Shipped"),
+                            ("delivered", "Delivered"),
+                            ("cancelled", "Cancelled"),
+                            ("invalid", "Invalid"),
+                        ],
+                        default="pending",
+                        max_length=15,
+                    ),
+                ),
+                (
+                    "tracking_number",
+                    models.CharField(blank=True, max_length=25, null=True),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
             ],
         ),
         migrations.CreateModel(
-            name='OrderProduct',
+            name="OrderProduct",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('product_quantity', models.PositiveIntegerField()),
-                ('product_price', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("product_quantity", models.PositiveIntegerField()),
+                ("product_price", models.PositiveIntegerField()),
             ],
         ),
     ]

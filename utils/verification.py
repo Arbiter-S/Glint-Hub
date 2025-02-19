@@ -1,8 +1,9 @@
-from secrets import randbelow
 from django.core.cache import cache
 from logging import getLogger
+from secrets import randbelow
 
 logger = getLogger(__name__)
+
 
 def generate_code():
     """
@@ -10,6 +11,7 @@ def generate_code():
     """
     code = randbelow(900000) + 100000
     return code
+
 
 def cache_email_code(user_id, verification_code):
     """
@@ -23,5 +25,5 @@ def cache_email_code(user_id, verification_code):
 
     """
 
-    cache.set(f'verify_email_{user_id}', verification_code, 60 * 5)
-    logger.info(f'Cached verification code for user_id: {user_id}')
+    cache.set(f"verify_email_{user_id}", verification_code, 60 * 5)
+    logger.info(f"Cached verification code for user_id: {user_id}")

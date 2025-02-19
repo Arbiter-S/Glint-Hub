@@ -6,17 +6,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('carts', '0004_alter_cart_products'),
-        ('products', '0001_initial'),
+        ("carts", "0004_alter_cart_products"),
+        ("products", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='cartproduct',
+            name="cartproduct",
             unique_together=set(),
         ),
         migrations.AddConstraint(
-            model_name='cartproduct',
-            constraint=models.UniqueConstraint(fields=('cart', 'product'), name='unique_product'),
+            model_name="cartproduct",
+            constraint=models.UniqueConstraint(
+                fields=("cart", "product"), name="unique_product"
+            ),
         ),
     ]

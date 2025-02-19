@@ -6,18 +6,18 @@ ALLOWED_HOSTS = []
 
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     },
 }
 
-SECRET_KEY = 'django-insecure-horu%2^i!qty2t+y2vf6fhk$6*t4%6z-23qgx1p_jgevbm^df4'
+SECRET_KEY = "django-insecure-horu%2^i!qty2t+y2vf6fhk$6*t4%6z-23qgx1p_jgevbm^df4"
 
-#TODO: Should I optimize containers and installed apps based on their responsibility or should I keep them consistent?
-INSTALLED_APPS = INSTALLED_APPS + ['debug_toolbar']
+# TODO: Should I optimize containers and installed apps based on their responsibility or should I keep them consistent?
+INSTALLED_APPS = INSTALLED_APPS + ["debug_toolbar"]
 
-MIDDLEWARE = ['debug_toolbar.middleware.DebugToolbarMiddleware'] + MIDDLEWARE
+MIDDLEWARE = ["debug_toolbar.middleware.DebugToolbarMiddleware"] + MIDDLEWARE
 
 INTERNAL_IPS = [
     "127.0.0.1",
@@ -29,7 +29,6 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
     "UPDATE_LAST_LOGIN": False,
-
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
     "VERIFYING_KEY": "",
@@ -38,23 +37,18 @@ SIMPLE_JWT = {
     "JSON_ENCODER": None,
     "JWK_URL": None,
     "LEEWAY": 0,
-
     "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
-
     "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
     "TOKEN_TYPE_CLAIM": "token_type",
     "TOKEN_USER_CLASS": "rest_framework_simplejwt.models.TokenUser",
-
     "JTI_CLAIM": "jti",
-
     "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
     "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
     "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
-
     "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
     "TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSerializer",
     "TOKEN_VERIFY_SERIALIZER": "rest_framework_simplejwt.serializers.TokenVerifySerializer",
@@ -68,14 +62,14 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": "redis://localhost:6379",
     },
-    "from_container": { # for celery running inside containers
+    "from_container": {  # for celery running inside containers
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": "redis://redis:6379",
     },
 }
 
-#SMTP configuration
-EMAIL_HOST = 'localhost'
+# SMTP configuration
+EMAIL_HOST = "localhost"
 EMAIL_PORT = 2525
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""

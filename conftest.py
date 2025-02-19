@@ -1,7 +1,7 @@
-import pytest
-from products.models import Product
 import faker
+import pytest
 import random
+from products.models import Product
 from rest_framework.test import APIClient
 
 fake = faker.Faker()
@@ -32,6 +32,7 @@ def create_products():
         products.append(product)
 
     return products
+
 
 @pytest.fixture()
 def client():
