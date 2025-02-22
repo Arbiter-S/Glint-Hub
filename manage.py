@@ -7,10 +7,7 @@ from utils.generic import fetch_settings
 
 load_dotenv(dotenv_path="Docker/.env")
 
-# Making logs directory to avoid errors by the loggers
-script_dir = os.path.dirname(os.path.realpath(__file__))
-log_dir = os.path.join(script_dir, "logs")
-os.makedirs(log_dir, exist_ok=True)
+
 
 
 settings = fetch_settings()

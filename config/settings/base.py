@@ -105,6 +105,11 @@ MEDIA_URL = "/media/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Making logs directory to avoid errors by the loggers
+log_dir = os.path.join(BASE_DIR, "logs")
+os.makedirs(log_dir, exist_ok=True)
+
+
 # logging configuration
 # TODO: logging in general have still so much room for improvement
 LOGGING = {
