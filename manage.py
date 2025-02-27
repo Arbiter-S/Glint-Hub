@@ -8,8 +8,6 @@ from utils.generic import fetch_settings
 load_dotenv(dotenv_path="Docker/.env")
 
 
-
-
 settings = fetch_settings()
 
 

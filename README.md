@@ -90,7 +90,7 @@ To run the tests run the following commands
 
     Run the following command in the terminal in project's root:
     ```bash
-    docker-compose --file Docker\docker-compose.development.yml up -d &&  pytest -vv && docker-compose --file Docker\docker-compose.development.yml down
+    docker-compose --file Docker/docker-compose.development.yml up -d &&  pytest -vv && docker-compose --file Docker/docker-compose.development.yml down
     ```
 
 These commands will start the containers, execute the tests on your local machine, and then shut down the

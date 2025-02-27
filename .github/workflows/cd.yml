@@ -1,0 +1,26 @@
+name: CD - build and deploy
+
+on:
+  workflow_run:
+    workflows: [CI - linting and testing]
+    types: [completed]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+      - name: build and deploy
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: root
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          port: 22
+          script: |
+            cd /home/Glint-Hub/
+            git pull
+            docker compose --file Docker/docker-compose.production.yml down
+            docker compose --file Docker/docker-compose.production.yml up --force-recreate -d

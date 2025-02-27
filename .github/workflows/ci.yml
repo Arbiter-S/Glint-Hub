@@ -1,0 +1,43 @@
+name: CI - linting and testing
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  linting:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: pip install black isort
+
+      - name: Black check
+        run: black --check .
+
+      - name: Isort check
+        run: isort --line-length=88 --check --no-sections --profile black .
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+
+      - name: Set up
+        run: touch Docker/.env
+
+      - name: Running test
+        run: |
+          docker compose --file Docker/docker-compose.development.yml up -d
+          pytest -vv
+          docker compose --file Docker/docker-compose.development.yml down
