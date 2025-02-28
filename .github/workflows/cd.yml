@@ -21,6 +21,7 @@ jobs:
           port: 22
           script: |
             cd /home/Glint-Hub/
-            git pull
+            git fetch
+            git reset --hard origin/master
             docker compose --file Docker/docker-compose.production.yml down
-            docker compose --file Docker/docker-compose.production.yml up --force-recreate -d
+            docker compose --file Docker/docker-compose.production.yml up --force-recreate --build -d
