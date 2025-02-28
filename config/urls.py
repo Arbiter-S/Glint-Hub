@@ -1,3 +1,4 @@
+from .views import index
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -18,6 +19,7 @@ urlpatterns = [
     path("cart/", include("carts.urls")),
     path("orders/", include("orders.urls")),
     path("transactions/", include("transactions.urls")),
+    path("", index, name="index"),
 ]
 
 if settings.DEBUG:

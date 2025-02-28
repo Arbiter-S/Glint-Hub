@@ -1,4 +1,5 @@
 from .base import *
+from datetime import timedelta
 from os import getenv
 
 DEBUG = False

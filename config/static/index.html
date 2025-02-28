@@ -1,0 +1,85 @@
+<!-- my_app/templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GlintHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+            text-align: center;
+        }
+
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 30px 0;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+
+        .content {
+            padding: 40px;
+            background-color: white;
+            margin: 20px auto;
+            max-width: 800px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .content p {
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .links {
+            margin-top: 50px;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+            margin: 0 15px;
+            padding: 8px 16px;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .links a:hover {
+            background-color: #3498db;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to GlintHub</h1>
+    </header>
+
+    <div class="content">
+<p>Hi! I'm Ali, and this is my project written in Django and DRF (Django Rest Framework).</p>
+
+<p>This project provides an API for an online jewelry store.
+    It includes various features such as user authentication, dynamic pricing, order processing and much more.</p>
+        <p>For more details, check out the project on GitHub.</p>
+
+        <div class="links">
+            <a href="https://github.com/Arbiter-S/Glint-Hub" target="_blank">GitHub</a>
+            <a href="/api/docs/ui/" target="_blank">API Docs</a>
+        </div>
+    </div>
+
+</body>
+</html>
